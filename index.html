@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#14442E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>AgriSentinel AI</title>
+<style>
+:root{
+  --green:#14442E; --green2:#1F6B45; --sage:#E8EFE4; --ink:#1B2A22; --muted:#4F6157; --line:#C4D3C1;
+  --tag:#F2C230; --tagink:#3A2D00;
+  --open:#9E2A1D; --openbg:#FBE6E2; --rev:#7A4F00; --revbg:#FFEFC2; --ok:#1B6A39; --okbg:#DCF0E1;
+}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--sage);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;font-size:17px;line-height:1.5;padding-bottom:92px}
+a{color:var(--green2)}
+h1,h2,h3{line-height:1.25;margin:0}
+
+/* Header */
+.top{background:var(--green);color:#fff;padding:12px 16px}
+.top-in{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.brand{font-size:21px;font-weight:800;letter-spacing:.2px}
+.brand small{display:block;font-size:13px;font-weight:500;opacity:.85;letter-spacing:0}
+.proto{background:var(--tag);color:var(--tagink);font-weight:700;font-size:13px;padding:4px 10px;border-radius:6px 14px 14px 6px}
+.strip{background:#FFF1BF;color:#4A3800;font-size:14px;line-height:1.4;padding:8px 16px;border-bottom:1px solid #E3CF86}
+.strip div{max-width:640px;margin:0 auto}
+.warnbar{background:var(--openbg);color:var(--open);font-weight:600;font-size:15px;padding:10px 16px}
+
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+.page{font-size:25px;font-weight:800;margin:6px 0 4px}
+.lead{color:var(--muted);margin:0 0 16px}
+h2.sec{font-size:19px;margin:22px 0 10px}
+
+/* Cards */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.card h3{font-size:18px;margin-bottom:8px}
+.notice{border-left:6px solid var(--tag);border-radius:6px 14px 14px 6px;background:#fff;padding:14px 16px;margin-bottom:14px}
+.notice b{display:block;margin-bottom:2px}
+.sampleinfo{background:#EEEBFA;border:1px solid #CFC9EE;border-radius:14px;padding:14px 16px;margin-bottom:14px;color:#2E2766}
+
+/* Ear tag */
+.etag{display:inline-block;position:relative;background:var(--tag);color:var(--tagink);font-weight:800;padding:2px 12px 2px 28px;border-radius:6px 14px 14px 6px;letter-spacing:.3px;font-size:16px;word-break:break-all}
+.etag:before{content:"";position:absolute;left:9px;top:50%;margin-top:-5px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #B08A00}
+
+/* Badges */
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:14px;line-height:1.4}
+.b-open{background:var(--openbg);color:var(--open)}
+.b-rev{background:var(--revbg);color:var(--rev)}
+.b-ok{background:var(--okbg);color:var(--ok)}
+.sample{display:inline-block;background:#E3E0F5;color:#3B3278;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:6px;vertical-align:middle}
+.info{display:inline-block;background:#F3E3C0;color:#5C3D00;font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px;margin:4px 6px 0 0}
+
+/* Stat tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;grid-gap:12px;gap:12px;margin-bottom:12px}
+.tile{display:block;text-decoration:none;color:var(--ink);border-radius:14px;padding:14px;border:1px solid var(--line);background:#fff}
+.tile .n{font-size:38px;font-weight:800;line-height:1.1}
+.tile .l{font-weight:700;font-size:16px}
+.tile .s{font-size:13.5px;color:var(--muted)}
+.t-open{background:var(--openbg);border-color:#EBC3BC}.t-open .n{color:var(--open)}
+.t-ok{background:var(--okbg);border-color:#B5DCC0}.t-ok .n{color:var(--ok)}
+.t-green{background:var(--green);border-color:var(--green);color:#fff}.t-green .s{color:#CFE5D6}
+
+/* Buttons */
+.btn{display:block;width:100%;min-height:56px;border:2px solid var(--green);border-radius:12px;background:var(--green);color:#fff;font-family:inherit;font-size:18px;font-weight:700;line-height:1.2;padding:14px 16px;text-align:center;text-decoration:none;cursor:pointer;margin-bottom:10px;-webkit-appearance:none}
+.btn:active{opacity:.8}
+.btn.alt{background:#fff;color:var(--green)}
+.btn.danger{background:#fff;color:var(--open);border-color:var(--open)}
+.btn.sm{min-height:48px;font-size:16px}
+.btn:focus{outline:3px solid #BFE3CB}
+
+/* Forms */
+.field{margin-bottom:18px}
+.lbl{display:block;font-weight:700;margin-bottom:6px}
+.hint{color:var(--muted);font-size:14.5px;margin-top:4px}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;min-height:52px;font-family:inherit;font-size:17px;color:var(--ink);padding:12px;border:2px solid #9FB5A0;border-radius:10px;background:#fff;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,#4F6157 50%),linear-gradient(135deg,#4F6157 50%,transparent 50%);background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:36px}
+select:disabled{background-color:#EEF2EC;color:#3A4A40}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:3px solid #BFE3CB;border-color:var(--green2)}
+.two{display:grid;grid-template-columns:1fr 1fr;grid-gap:12px;gap:12px}
+.err{color:var(--open);font-weight:600;font-size:15px;margin-top:6px}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));grid-gap:8px;gap:8px}
+.seg label{position:relative;display:block}
+.seg input{position:absolute;left:0;top:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.seg span{display:block;text-align:center;min-height:52px;padding:13px 8px;border:2px solid #9FB5A0;border-radius:10px;background:#fff;font-weight:600;line-height:1.3}
+.seg input:checked+span{background:var(--green);border-color:var(--green);color:#fff}
+.seg input:focus+span{outline:3px solid #BFE3CB}
+.seg.multi input:checked+span:before{content:"\2713\00a0"}
+.seg.multi{grid-template-columns:1fr}
+
+/* Lists / case cards */
+.casecard{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;color:var(--ink);text-decoration:none}
+.casecard:active{background:#F4F8F2}
+.cc-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.cc-ref{font-weight:800;font-size:18px}
+.cc-meta{color:var(--muted);font-size:15px;margin-top:6px}
+.chips{margin-bottom:12px}
+.chips button{display:inline-block;min-height:48px;margin:0 8px 8px 0;padding:8px 16px;border:2px solid #9FB5A0;border-radius:999px;background:#fff;color:var(--ink);font-family:inherit;font-size:16px;font-weight:600}
+.chips button.on{background:var(--green);border-color:var(--green);color:#fff}
+.back{display:inline-block;min-height:48px;line-height:48px;font-weight:700;text-decoration:none;font-size:17px}
+.kv{display:grid;grid-template-columns:1fr;grid-gap:10px;gap:10px;margin:10px 0 0}
+.kv div{border-top:1px solid #E3EBE0;padding-top:8px}
+.kv dt{font-size:14px;color:var(--muted);font-weight:600}
+.kv dd{margin:0;font-weight:600}
+.hist{list-style:none;margin:0;padding:0}
+.hist li{padding:8px 0;border-top:1px solid #E3EBE0}
+.hist li:first-child{border-top:0}
+.empty{background:#fff;border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;color:var(--muted);margin-bottom:12px}
+.rec-head{display:block;width:100%;text-align:left;background:none;border:0;padding:0;font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+.rec-body{margin-top:12px;border-top:1px solid #E3EBE0;padding-top:12px}
+.rec-link{display:block;text-decoration:none;color:var(--ink);padding:10px 0;border-top:1px solid #E3EBE0}
+.rec-link:first-child{border-top:0}
+
+/* Bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:2px solid var(--line);display:flex;padding-bottom:0;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+.nav a{flex:1;display:block;text-align:center;text-decoration:none;color:var(--muted);font-size:12.5px;font-weight:700;padding:8px 2px 8px;min-height:64px}
+.nav svg{display:block;margin:0 auto 2px;width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav a.on{color:var(--green);background:#E3F0E6;box-shadow:inset 0 3px 0 var(--green)}
+
+.toast{position:fixed;left:16px;right:16px;bottom:84px;max-width:608px;margin:0 auto;background:var(--green);color:#fff;font-weight:700;padding:14px 16px;border-radius:12px;z-index:30;text-align:center}
+.foot{max-width:640px;margin:0 auto;padding:4px 16px 12px;color:var(--muted);font-size:14px;text-align:center}
+.btn.wa{background:#1B7F42;border-color:#1B7F42}
+.btn.wa:focus{outline:3px solid #BFE3CB}
+a.btn.alt{color:var(--green)}
+.dx{border-top:1px solid #E3EBE0;padding:12px 0}
+.dx .badge{margin-top:2px}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <div class="brand">AgriSentinel AI<small>Livestock health records for Nigeria</small></div>
+  <span class="proto">Prototype</span>
+</div></header>
+<div class="strip"><div><b>Early prototype.</b> Records information only. It does not diagnose disease and does not replace professional veterinary assessment.</div></div>
+<div class="warnbar" id="store-warn" hidden>Browser storage is unavailable here (private mode or blocked). Records will be lost when you refresh or close this page.</div>
+
+<main class="wrap">
+
+<!-- 1. DASHBOARD -->
+<section id="view-dashboard" class="view">
+  <h1 class="page">Dashboard</h1>
+  <p class="lead">Cattle, goats and sheep at a glance.</p>
+
+  <div class="notice">
+    <b>Not a diagnostic tool</b>
+    AgriSentinel AI helps you record and track animal health problems. It does not diagnose diseases, prescribe medicines or give treatment doses. If animals are very sick or dying, contact a veterinary surgeon straight away.
+  </div>
+
+  <div class="card" id="role-card"></div>
+  <div id="sample-info" class="sampleinfo" hidden></div>
+  <div class="tiles" id="tiles"></div>
+  <div id="review-line" class="hint" style="margin:-2px 0 14px"></div>
+
+  <a class="btn" href="#report">Report a sick animal</a>
+  <a class="btn alt" href="#register">Register an animal</a>
+
+  <h2 class="sec">Latest cases</h2>
+  <div id="dash-recent"></div>
+
+  <h2 class="sec">Data</h2>
+  <button type="button" class="btn danger sm" id="btn-reset">Delete all records on this device</button>
+</section>
+
+<!-- 2. ANIMAL REGISTRATION -->
+<section id="view-register" class="view" hidden>
+  <h1 class="page">Register an animal</h1>
+  <p class="lead">Give each animal its own ID, such as its ear tag number.</p>
+  <form id="form-register" class="card" novalidate autocomplete="off">
+    <div class="field"><label class="lbl" for="a-id">Animal ID</label>
+      <input type="text" id="a-id" autocapitalize="characters" placeholder="e.g. KD-C-020">
+      <div class="err" id="e-a-id" hidden></div></div>
+    <div class="field"><label class="lbl" for="a-species">Species</label>
+      <select id="a-species"><option value="">Choose species</option><option>Cattle</option><option>Goat</option><option>Sheep</option></select>
+      <div class="err" id="e-a-species" hidden></div></div>
+    <div class="field"><label class="lbl" for="a-breed">Breed</label>
+      <input type="text" id="a-breed" list="breed-list" placeholder="e.g. White Fulani">
+      <div class="hint">Type "Mixed" or "Unknown" if you are not sure.</div>
+      <div class="err" id="e-a-breed" hidden></div></div>
+    <div class="field"><span class="lbl">Age</span>
+      <div class="two">
+        <input type="number" id="a-age" inputmode="numeric" min="1" placeholder="Number" aria-label="Age number">
+        <select id="a-ageunit" aria-label="Age unit"><option value="months">months</option><option value="years" selected>years</option></select>
+      </div>
+      <div class="err" id="e-a-age" hidden></div></div>
+    <div class="field"><span class="lbl">Sex</span>
+      <div class="seg"><label><input type="radio" name="a-sex" value="Female"><span>Female</span></label><label><input type="radio" name="a-sex" value="Male"><span>Male</span></label></div>
+      <div class="err" id="e-a-sex" hidden></div></div>
+    <div class="field"><label class="lbl" for="a-location">Farm location</label>
+      <input type="text" id="a-location" placeholder="Village or farm, LGA, State">
+      <div class="err" id="e-a-location" hidden></div></div>
+    <div class="field"><label class="lbl" for="a-owner">Owner name</label>
+      <input type="text" id="a-owner" placeholder="Farmer or farm owner">
+      <div class="err" id="e-a-owner" hidden></div></div>
+    <div class="field"><label class="lbl" for="a-ownerphone">Owner phone (optional)</label>
+      <input type="text" id="a-ownerphone" inputmode="tel" placeholder="e.g. 0803 000 0000">
+      <div class="hint">Used for calling or WhatsApp.</div>
+      <div class="err" id="e-a-ownerphone" hidden></div></div>
+    <button type="submit" class="btn">Save animal</button>
+  </form>
+  <datalist id="breed-list"></datalist>
+
+  <h2 class="sec">Recently registered</h2>
+  <div id="recent-animals"></div>
+</section>
+
+<!-- 3. REPORT A CASE -->
+<section id="view-report" class="view" hidden>
+  <h1 class="page">Report a case</h1>
+  <p class="lead">Record what you see. A veterinary surgeon decides what it means.</p>
+  <div class="notice"><b>Record only</b>No diagnosis or treatment advice is given here. If animals are dying, call a veterinary surgeon now.</div>
+  <form id="form-report" class="card" novalidate autocomplete="off">
+    <div class="field"><label class="lbl" for="r-animal">Animal ID</label>
+      <input type="text" id="r-animal" list="animal-list" autocapitalize="characters" placeholder="Type or choose an ID">
+      <div class="hint" id="r-hint"></div>
+      <div class="err" id="e-r-animal" hidden></div></div>
+    <datalist id="animal-list"></datalist>
+    <div class="field"><label class="lbl" for="r-species">Species</label>
+      <select id="r-species"><option value="">Choose species</option><option>Cattle</option><option>Goat</option><option>Sheep</option></select>
+      <div class="err" id="e-r-species" hidden></div></div>
+    <div class="field"><span class="lbl">How long has the animal been ill?</span>
+      <div class="two">
+        <input type="number" id="r-dur" inputmode="numeric" min="1" placeholder="Number" aria-label="Duration number">
+        <select id="r-durunit" aria-label="Duration unit"><option value="hours">hours</option><option value="days" selected>days</option><option value="weeks">weeks</option></select>
+      </div>
+      <div class="err" id="e-r-dur" hidden></div></div>
+    <div class="field"><span class="lbl">Appetite</span>
+      <div class="seg"><label><input type="radio" name="r-app" value="Normal"><span>Normal</span></label><label><input type="radio" name="r-app" value="Reduced"><span>Reduced</span></label><label><input type="radio" name="r-app" value="Not eating"><span>Not eating</span></label></div>
+      <div class="err" id="e-r-app" hidden></div></div>
+    <div class="field"><label class="lbl" for="r-temp">Measured temperature (&deg;C)</label>
+      <input type="number" id="r-temp" inputmode="decimal" step="0.1" placeholder="e.g. 39.5">
+      <div class="hint">Only enter a reading from a thermometer. Leave blank if not measured.</div>
+      <div class="err" id="e-r-temp" hidden></div></div>
+    <div class="field"><span class="lbl">Respiratory signs</span><div class="seg multi" id="g-resp"></div>
+      <div class="err" id="e-r-resp" hidden></div></div>
+    <div class="field"><span class="lbl">Digestive signs</span><div class="seg multi" id="g-dig"></div>
+      <div class="err" id="e-r-dig" hidden></div></div>
+    <div class="field"><span class="lbl">Visible lesions</span><div class="seg multi" id="g-les"></div>
+      <div class="err" id="e-r-les" hidden></div>
+      <div style="margin-top:10px"><input type="text" id="r-lesdesc" placeholder="Where on the body and how big? (optional)" aria-label="Lesion description"></div></div>
+    <div class="field"><span class="lbl">Other signs (optional)</span><div class="seg multi" id="g-oth"></div></div>
+    <div class="field"><label class="lbl" for="r-vacc">Vaccination status</label>
+      <select id="r-vacc"><option>Unknown</option><option>Up to date</option><option>Partly vaccinated</option><option>Not vaccinated</option></select></div>
+    <div class="field"><label class="lbl" for="r-contact">New animals or contact with other herds in the last 3 weeks?</label>
+      <select id="r-contact"><option>Unknown</option><option>Yes</option><option>No</option></select></div>
+    <div class="field"><span class="lbl">Animals affected and deaths</span>
+      <div class="two">
+        <div><label class="hint" for="r-aff" style="margin:0 0 4px;display:block">Affected (include any that died)</label><input type="number" id="r-aff" inputmode="numeric" min="1" value="1"></div>
+        <div><label class="hint" for="r-dead" style="margin:0 0 4px;display:block">Deaths</label><input type="number" id="r-dead" inputmode="numeric" min="0" value="0"></div>
+      </div>
+      <div class="err" id="e-r-aff" hidden></div></div>
+    <div class="field"><span class="lbl">Veterinary surgeon (optional)</span>
+      <div class="two"><input type="text" id="r-vet" placeholder="Name" aria-label="Veterinary surgeon name"><input type="text" id="r-vetphone" inputmode="tel" placeholder="Phone" aria-label="Veterinary surgeon phone"></div>
+      <div class="err" id="e-r-vet" hidden></div></div>
+    <div class="field"><label class="lbl" for="r-notes">Additional observations</label>
+      <textarea id="r-notes" placeholder="Recent movement, new animals, feed or water changes, vaccination status, anything else"></textarea></div>
+    <button type="submit" class="btn">Submit case</button>
+  </form>
+</section>
+
+<!-- 4. CASE MANAGEMENT -->
+<section id="view-cases" class="view" hidden>
+  <div id="cases-list-wrap">
+    <h1 class="page">Cases</h1>
+    <p class="lead">Search, open and update reported cases.</p>
+    <div class="field"><input type="search" id="case-search" placeholder="Search by case, animal ID, species, owner, location" aria-label="Search cases"></div>
+    <div class="chips" id="case-filters"></div>
+    <div id="case-count" class="hint" style="margin-bottom:8px"></div>
+    <div id="case-list"></div>
+  </div>
+  <div id="case-detail" hidden></div>
+</section>
+
+<!-- 5. HEALTH RECORDS -->
+<section id="view-records" class="view" hidden>
+  <h1 class="page">Health records</h1>
+  <p class="lead">Each animal and its case history. Tap an animal to open it.</p>
+  <div class="field"><input type="search" id="rec-search" placeholder="Search by ID, breed, species, owner, location" aria-label="Search animals"></div>
+  <div id="rec-list"></div>
+</section>
+
+</main>
+<footer class="foot" id="foot"></footer>
+
+<div class="toast" id="toast" hidden></div>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <a href="#dashboard" data-v="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
+  <a href="#register" data-v="register"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>Register</a>
+  <a href="#report" data-v="report"><svg viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>Report</a>
+  <a href="#cases" data-v="cases"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Cases</a>
+  <a href="#records" data-v="records"><svg viewBox="0 0 24 24"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 9h8M8 13h6"/></svg>Records</a>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Storage (localStorage with in-memory fallback) ---------- */
+  var KEY = 'agrisentinel_prototype_v1';
+  var storageOK = true;
+  try { localStorage.setItem('__as_test', '1'); localStorage.removeItem('__as_test'); } catch (e) { storageOK = false; }
+
+  function readStore() {
+    if (!storageOK) { return null; }
+    try {
+      var raw = localStorage.getItem(KEY);
+      var s = raw ? JSON.parse(raw) : null;
+      if (s && Array.isArray(s.animals) && Array.isArray(s.cases)) { return s; }
+    } catch (e) {}
+    return null;
+  }
+  function save() {
+    if (!storageOK) { return; }
+    try { localStorage.setItem(KEY, JSON.stringify(state)); }
+    catch (e) { storageOK = false; $('store-warn').hidden = false; }
+  }
+
+  /* ---------- Helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function pad(n, w) { var s = String(n); while (s.length < w) { s = '0' + s; } return s; }
+  function nowISO() { return new Date().toISOString(); }
+  function daysAgo(n) { var d = new Date(); d.setDate(d.getDate() - n); return d.toISOString(); }
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) { return ''; }
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+  function normId(s) { return String(s || '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+  function listText(arr) { return arr && arr.length ? arr.join(', ') : 'None recorded'; }
+
+  var BUILDER = 'Dr. Mansur Nuhu';
+  var FEEDBACK_PHONE = '08062246974', FEEDBACK_EMAIL = 'mansurnuhu55@gmail.com';
+  function cleanPhone(p) { return String(p || '').replace(/[^\d+]/g, ''); }
+  function phoneOK(p) { var d = String(p || '').replace(/\D/g, ''); return d.length >= 10 && d.length <= 15; }
+  function waNumber(p) {
+    var d = String(p || '').replace(/\D/g, '');
+    if (d.charAt(0) === '0' && d.length === 11) { return '234' + d.slice(1); }
+    return d;
+  }
+  function phoneLinks(p) {
+    if (!p) { return 'Not recorded'; }
+    return esc(p) + '<br><a href="tel:' + esc(cleanPhone(p)) + '">Call</a> \u00B7 <a href="https://wa.me/' + esc(waNumber(p)) + '" target="_blank" rel="noopener">WhatsApp</a>';
+  }
+
+  var STATUSES = ['Open', 'Under Veterinary Review', 'Resolved'];
+  function badge(s) {
+    var c = s === 'Open' ? 'b-open' : (s === 'Resolved' ? 'b-ok' : 'b-rev');
+    return '<span class="badge ' + c + '">' + esc(s) + '</span>';
+  }
+  function sampleTag(x) { return x && x.sample ? '<span class="sample">Sample</span>' : ''; }
+  function etag(id) { return '<span class="etag">' + esc(id) + '</span>'; }
+  function ageText(a) { return a.ageValue + ' ' + (Number(a.ageValue) === 1 ? a.ageUnit.replace(/s$/, '') : a.ageUnit); }
+  function durText(c) { return c.durValue + ' ' + (Number(c.durValue) === 1 ? c.durUnit.replace(/s$/, '') : c.durUnit); }
+  function tempText(c) { return c.temp != null ? Number(c.temp).toFixed(1) + ' \u00B0C' : 'Not measured'; }
+
+  var BREEDS = {
+    Cattle: ['White Fulani', 'Red Bororo', 'Sokoto Gudali', 'Adamawa Gudali', 'Muturu', 'Keteku', 'Ndama', 'Mixed', 'Unknown'],
+    Goat: ['Red Sokoto', 'West African Dwarf', 'Sahel', 'Kano Brown', 'Mixed', 'Unknown'],
+    Sheep: ['Yankasa', 'Uda', 'Balami', 'Ouda', 'West African Dwarf', 'Mixed', 'Unknown']
+  };
+  var RESP = ['Coughing', 'Fast or laboured breathing', 'Nasal discharge', 'Noisy breathing', 'None observed'];
+  var DIG = ['Diarrhoea', 'Constipation', 'Bloating', 'Drooling', 'Not chewing cud', 'None observed'];
+  var LES = ['Skin lumps or nodules', 'Wounds', 'Mouth sores', 'Foot or hoof sores', 'Swelling', 'None observed'];
+
+  /* ---------- Sample data (clearly flagged sample:true) ---------- */
+  function makeSample() {
+    function an(id, sp, br, av, au, sx, loc) { return { id: id, species: sp, breed: br, ageValue: av, ageUnit: au, sex: sx, location: loc, ownerName: 'Sample owner', ownerPhone: '', sample: true, created: daysAgo(30) }; }
+    function cs(n, aid, sp, dv, du, app, temp, resp, dig, les, aff, dead, notes, status, ago, hist) {
+      return { ref: 'C-' + pad(n, 4), animalId: aid, species: sp, durValue: dv, durUnit: du, appetite: app, temp: temp,
+        resp: resp, dig: dig, les: les, lesDesc: '', vetName: '', vetPhone: '', affected: aff, deaths: dead, notes: notes, status: status,
+        created: daysAgo(ago), history: hist, sample: true };
+    }
+    return {
+      nextCase: 6,
+      animals: [
+        an('KD-C-001', 'Cattle', 'White Fulani', 4, 'years', 'Female', 'Birnin Gwari, Kaduna State'),
+        an('KD-C-002', 'Cattle', 'Sokoto Gudali', 6, 'years', 'Male', 'Birnin Gwari, Kaduna State'),
+        an('KD-G-010', 'Goat', 'Red Sokoto', 18, 'months', 'Female', 'Zaria, Kaduna State'),
+        an('KD-G-011', 'Goat', 'West African Dwarf', 10, 'months', 'Male', 'Zaria, Kaduna State'),
+        an('KN-S-005', 'Sheep', 'Yankasa', 2, 'years', 'Female', 'Dawakin Tofa, Kano State'),
+        an('KN-S-006', 'Sheep', 'Uda', 3, 'years', 'Male', 'Dawakin Tofa, Kano State')
+      ],
+      cases: [
+        cs(1, 'KD-C-001', 'Cattle', 5, 'days', 'Reduced', 40.1, ['Coughing', 'Nasal discharge'], ['None observed'], ['None observed'], 3, 0,
+          'Sample record. Herd was moved to a new grazing area last week.', 'Open', 6, [{ status: 'Open', at: daysAgo(6) }]),
+        cs(2, 'KD-G-010', 'Goat', 2, 'days', 'Not eating', 40.4, ['Fast or laboured breathing'], ['Diarrhoea'], ['Mouth sores'], 6, 1,
+          'Sample record. One kid died overnight.', 'Under Veterinary Review', 3,
+          [{ status: 'Open', at: daysAgo(3) }, { status: 'Under Veterinary Review', at: daysAgo(2) }]),
+        cs(3, 'KN-S-005', 'Sheep', 1, 'weeks', 'Reduced', 39.2, ['None observed'], ['Bloating'], ['None observed'], 1, 0,
+          'Sample record. Fed new forage before signs started.', 'Resolved', 14,
+          [{ status: 'Open', at: daysAgo(14) }, { status: 'Under Veterinary Review', at: daysAgo(13) }, { status: 'Resolved', at: daysAgo(9) }]),
+        cs(4, 'KD-C-002', 'Cattle', 3, 'days', 'Normal', 38.9, ['None observed'], ['None observed'], ['Skin lumps or nodules'], 1, 0,
+          'Sample record. Lumps noticed on the neck and flank.', 'Open', 2, [{ status: 'Open', at: daysAgo(2) }]),
+        cs(5, 'KD-G-011', 'Goat', 4, 'days', 'Reduced', null, ['None observed'], ['Diarrhoea'], ['None observed'], 2, 0,
+          'Sample record. Temperature was not measured.', 'Resolved', 10,
+          [{ status: 'Open', at: daysAgo(10) }, { status: 'Resolved', at: daysAgo(7) }])
+      ]
+    };
+  }
+
+  var state = readStore();
+  if (!state) { state = makeSample(); save(); }
+  if (!storageOK) { $('store-warn').hidden = false; }
+
+  function getAnimal(id) {
+    id = normId(id);
+    for (var i = 0; i < state.animals.length; i++) { if (state.animals[i].id === id) { return state.animals[i]; } }
+    return null;
+  }
+  function getCase(ref) {
+    for (var i = 0; i < state.cases.length; i++) { if (state.cases[i].ref === ref) { return state.cases[i]; } }
+    return null;
+  }
+  function sortedCases() {
+    return state.cases.slice().sort(function (a, b) { return new Date(b.created) - new Date(a.created); });
+  }
+
+  /* ---------- Toast ---------- */
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 2800);
+  }
+
+  /* ---------- Shared renderers ---------- */
+  function caseCard(c) {
+    var meta = c.species + ' \u00B7 ' + fmtDate(c.created) + '<br>Affected: ' + c.affected + ' \u00B7 Deaths: ' + c.deaths;
+    return '<a class="casecard" href="#cases/' + encodeURIComponent(c.ref) + '">' +
+      '<div class="cc-top"><span class="cc-ref">' + esc(c.ref) + sampleTag(c) + '</span>' + badge(c.status) + '</div>' +
+      etag(c.animalId) + '<div class="cc-meta">' + meta + '</div></a>';
+  }
+  function emptyBox(msg, linkHref, linkText) {
+    return '<div class="empty">' + esc(msg) + (linkHref ? '<br><br><a class="btn sm" href="' + linkHref + '">' + esc(linkText) + '</a>' : '') + '</div>';
+  }
+  function kv(label, value) { return '<div><dt>' + esc(label) + '</dt><dd>' + value + '</dd></div>'; }
+
+  /* ---------- 1. Dashboard ---------- */
+  function renderDashboard() {
+    var sampleAnimals = 0, sampleCases = 0, open = 0, openS = 0, res = 0, resS = 0, rev = 0, i, c;
+    for (i = 0; i < state.animals.length; i++) { if (state.animals[i].sample) { sampleAnimals++; } }
+    for (i = 0; i < state.cases.length; i++) {
+      c = state.cases[i];
+      if (c.sample) { sampleCases++; }
+      if (c.status === 'Open') { open++; if (c.sample) { openS++; } }
+      else if (c.status === 'Resolved') { res++; if (c.sample) { resS++; } }
+      else { rev++; }
+    }
+    function sub(n) { return n > 0 ? '<div class="s">includes ' + n + ' sample</div>' : '<div class="s">&nbsp;</div>'; }
+    $('tiles').innerHTML =
+      '<a class="tile t-green" href="#records"><div class="n">' + state.animals.length + '</div><div class="l">Registered animals</div>' + sub(sampleAnimals) + '</a>' +
+      '<a class="tile" href="#cases" data-filter="All"><div class="n">' + state.cases.length + '</div><div class="l">Reported cases</div>' + sub(sampleCases) + '</a>' +
+      '<a class="tile t-open" href="#cases" data-filter="Open"><div class="n">' + open + '</div><div class="l">Open cases</div>' + sub(openS) + '</a>' +
+      '<a class="tile t-ok" href="#cases" data-filter="Resolved"><div class="n">' + res + '</div><div class="l">Resolved cases</div>' + sub(resS) + '</a>';
+    $('review-line').textContent = rev + ' case' + (rev === 1 ? '' : 's') + ' under veterinary review (counted in reported cases).';
+
+    function roleOpt(v) { return '<label><input type="radio" name="role" value="' + v + '"' + ((state.role || 'Farmer') === v ? ' checked' : '') + '><span>' + v + '</span></label>'; }
+    $('role-card').innerHTML = '<h3>Using the app as</h3><div class="seg">' + roleOpt('Farmer') + roleOpt('Veterinary surgeon') + '</div>' +
+      '<div class="hint" style="margin-top:8px">Veterinary view adds decision support and an assessment form to each case. This only changes what is shown on this phone. It is not a login.</div>';
+    var info = $('sample-info');
+    if (sampleAnimals + sampleCases > 0) {
+      info.hidden = false;
+      info.innerHTML = '<b>Sample data</b><br>Records marked "Sample" were added so you can try the app. They are not real animals or cases and they are included in the numbers below.' +
+        '<div style="margin-top:12px"><button type="button" class="btn alt sm" id="btn-rm-sample" style="margin:0">Remove sample data</button></div>';
+    } else { info.hidden = true; info.innerHTML = ''; }
+
+    var recent = sortedCases().slice(0, 3), html = '';
+    for (i = 0; i < recent.length; i++) { html += caseCard(recent[i]); }
+    $('dash-recent').innerHTML = html || emptyBox('No cases reported yet.', '#report', 'Report a case');
+    if (recent.length) { $('dash-recent').innerHTML += '<a class="btn alt sm" href="#cases">See all cases</a>'; }
+  }
+
+  /* ---------- 2. Registration ---------- */
+  function fillAnimalList() {
+    var html = '';
+    for (var i = 0; i < state.animals.length; i++) { html += '<option value="' + esc(state.animals[i].id) + '">'; }
+    $('animal-list').innerHTML = html;
+  }
+  function fillBreeds() {
+    var sp = $('a-species').value, list = sp ? BREEDS[sp] : [], html = '';
+    for (var i = 0; i < list.length; i++) { html += '<option value="' + esc(list[i]) + '">'; }
+    $('breed-list').innerHTML = html;
+  }
+  function animalCard(a) {
+    var n = 0;
+    for (var i = 0; i < state.cases.length; i++) { if (state.cases[i].animalId === a.id) { n++; } }
+    return '<div class="card">' + etag(a.id) + sampleTag(a) +
+      '<div style="margin-top:6px;font-weight:600">' + esc(a.species) + ' \u00B7 ' + esc(a.breed) + '</div>' +
+      '<div class="cc-meta">' + esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + '<br>' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded') + (a.ownerPhone ? ' \u00B7 ' + esc(a.ownerPhone) : '') + '<br>' + n + ' case' + (n === 1 ? '' : 's') + ' on record</div></div>';
+  }
+  function renderRecentAnimals() {
+    var html = '', n = Math.min(state.animals.length, 5);
+    for (var i = 0; i < n; i++) { html += animalCard(state.animals[i]); }
+    $('recent-animals').innerHTML = html || emptyBox('No animals registered yet.');
+  }
+
+  /* ---------- Form helpers ---------- */
+  function clearErrs(form) {
+    var els = form.querySelectorAll('.err');
+    for (var i = 0; i < els.length; i++) { els[i].hidden = true; els[i].textContent = ''; }
+  }
+  function Validator(form) { this.form = form; this.first = null; this.count = 0; }
+  Validator.prototype.fail = function (key, msg) {
+    var el = $('e-' + key);
+    el.textContent = msg; el.hidden = false;
+    if (!this.first) { this.first = el; }
+    this.count++;
+  };
+  Validator.prototype.done = function () {
+    if (this.first && this.first.scrollIntoView) { this.first.scrollIntoView(); }
+    return this.count === 0;
+  };
+  function radioVal(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function checkedVals(containerId) {
+    var els = $(containerId).querySelectorAll('input:checked'), out = [];
+    for (var i = 0; i < els.length; i++) { out.push(els[i].value); }
+    return out;
+  }
+  function buildChecks(containerId, name, options) {
+    var html = '';
+    for (var i = 0; i < options.length; i++) {
+      var none = options[i] === 'None observed' ? ' data-none="1"' : '';
+      html += '<label><input type="checkbox" name="' + name + '" value="' + esc(options[i]) + '"' + none + '><span>' + esc(options[i]) + '</span></label>';
+    }
+    var box = $(containerId);
+    box.innerHTML = html;
+    box.addEventListener('change', function (e) {
+      var t = e.target, all = box.querySelectorAll('input');
+      if (t.type !== 'checkbox' || !t.checked) { return; }
+      for (var i = 0; i < all.length; i++) {
+        if (all[i] === t) { continue; }
+        if (t.getAttribute('data-none')) { all[i].checked = false; }
+        else if (all[i].getAttribute('data-none')) { all[i].checked = false; }
+      }
+    });
+  }
+
+  $('a-species').addEventListener('change', fillBreeds);
+  $('form-register').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(f);
+    clearErrs(f);
+    var id = normId($('a-id').value), sp = $('a-species').value, breed = $('a-breed').value.trim(),
+        age = parseInt($('a-age').value, 10), unit = $('a-ageunit').value, sex = radioVal('a-sex'), loc = $('a-location').value.trim(),
+        own = $('a-owner').value.trim(), ownPh = $('a-ownerphone').value.trim();
+    if (!id) { v.fail('a-id', 'Enter an animal ID.'); }
+    else if (getAnimal(id)) { v.fail('a-id', 'This ID is already registered. Use a different ID.'); }
+    if (!sp) { v.fail('a-species', 'Choose cattle, goat or sheep.'); }
+    if (!breed) { v.fail('a-breed', 'Enter a breed, or type "Unknown".'); }
+    if (isNaN(age) || age < 1) { v.fail('a-age', 'Enter the age as a whole number, 1 or more.'); }
+    else if (unit === 'years' && age > 30) { v.fail('a-age', 'Age in years looks too high. Check the number.'); }
+    if (!sex) { v.fail('a-sex', 'Choose male or female.'); }
+    if (!loc) { v.fail('a-location', 'Enter the farm location.'); }
+    if (!own) { v.fail('a-owner', 'Enter the owner name.'); }
+    if (ownPh && !phoneOK(ownPh)) { v.fail('a-ownerphone', 'Enter a phone number with 10 to 15 digits, or leave it blank.'); }
+    if (!v.done()) { return; }
+    state.animals.unshift({ id: id, species: sp, breed: breed, ageValue: age, ageUnit: unit, sex: sex, location: loc, ownerName: own, ownerPhone: ownPh, sample: false, created: nowISO() });
+    save();
+    f.reset(); fillBreeds(); fillAnimalList(); renderRecentAnimals();
+    toast('Animal ' + id + ' saved');
+  });
+
+  /* ---------- 3. Report a case ---------- */
+  function lookupAnimal() {
+    var id = normId($('r-animal').value), a = getAnimal(id), sel = $('r-species'), hint = $('r-hint');
+    if (a) {
+      sel.value = a.species; sel.disabled = true;
+      hint.textContent = 'Registered: ' + a.species + ' \u00B7 ' + a.breed + ' \u00B7 ' + a.location;
+    } else {
+      sel.disabled = false;
+      hint.textContent = id ? 'Not registered yet. The case will still be saved. You can register this animal later.' : '';
+    }
+  }
+  $('r-animal').addEventListener('input', lookupAnimal);
+  $('r-animal').addEventListener('change', lookupAnimal);
+
+  $('form-report').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(f);
+    clearErrs(f);
+    var id = normId($('r-animal').value), sp = $('r-species').value, dur = parseInt($('r-dur').value, 10),
+        app = radioVal('r-app'), tRaw = $('r-temp').value.trim(), temp = tRaw === '' ? null : parseFloat(tRaw),
+        resp = checkedVals('g-resp'), dig = checkedVals('g-dig'), les = checkedVals('g-les'),
+        aff = parseInt($('r-aff').value, 10), dead = parseInt($('r-dead').value, 10),
+        vet = $('r-vet').value.trim(), vetPh = $('r-vetphone').value.trim(), oth = checkedVals('g-oth');
+    if (!id) { v.fail('r-animal', 'Enter the animal ID.'); }
+    if (!sp) { v.fail('r-species', 'Choose the species.'); }
+    if (isNaN(dur) || dur < 1) { v.fail('r-dur', 'Enter how long as a number, 1 or more.'); }
+    if (!app) { v.fail('r-app', 'Choose the appetite.'); }
+    if (temp !== null && (isNaN(temp) || temp < 30 || temp > 45)) { v.fail('r-temp', 'Enter a temperature between 30 and 45 \u00B0C, or leave it blank.'); }
+    if (!resp.length) { v.fail('r-resp', 'Select at least one, or "None observed".'); }
+    if (!dig.length) { v.fail('r-dig', 'Select at least one, or "None observed".'); }
+    if (!les.length) { v.fail('r-les', 'Select at least one, or "None observed".'); }
+    if (isNaN(aff) || aff < 1) { v.fail('r-aff', 'Number affected must be 1 or more.'); }
+    else if (isNaN(dead) || dead < 0) { v.fail('r-aff', 'Deaths must be 0 or more.'); }
+    else if (dead > aff) { v.fail('r-aff', 'Deaths cannot be more than the number affected.'); }
+    if (vetPh && !phoneOK(vetPh)) { v.fail('r-vet', 'Enter a phone number with 10 to 15 digits, or leave it blank.'); }
+    if (!v.done()) { return; }
+
+    var ref = 'C-' + pad(state.nextCase++, 4), at = nowISO();
+    state.cases.push({
+      ref: ref, animalId: id, species: sp, durValue: dur, durUnit: $('r-durunit').value, appetite: app, temp: temp,
+      resp: resp, dig: dig, les: les, lesDesc: $('r-lesdesc').value.trim(), vetName: vet, vetPhone: vetPh, oth: oth, vacc: $('r-vacc').value, contact: $('r-contact').value, affected: aff, deaths: dead,
+      notes: $('r-notes').value.trim(), status: 'Open', created: at, history: [{ status: 'Open', at: at }], sample: false
+    });
+    save();
+    f.reset(); lookupAnimal();
+    $('r-aff').value = 1; $('r-dead').value = 0;
+    toast('Case ' + ref + ' submitted');
+    location.hash = '#cases/' + encodeURIComponent(ref);
+  });
+
+  /* ---------- 4. Case management ---------- */
+  var caseFilter = 'All';
+  function renderFilters() {
+    var opts = ['All'].concat(STATUSES), html = '';
+    for (var i = 0; i < opts.length; i++) {
+      html += '<button type="button" data-filter="' + esc(opts[i]) + '" class="' + (caseFilter === opts[i] ? 'on' : '') + '">' + esc(opts[i]) + '</button>';
+    }
+    $('case-filters').innerHTML = html;
+  }
+  function renderCaseList() {
+    var q = $('case-search').value.toLowerCase().trim(), all = sortedCases(), out = '', n = 0;
+    for (var i = 0; i < all.length; i++) {
+      var c = all[i], a = getAnimal(c.animalId);
+      if (caseFilter !== 'All' && c.status !== caseFilter) { continue; }
+      var hay = [c.ref, c.animalId, c.species, c.status, c.notes, c.vetName, a ? a.breed + ' ' + a.location + ' ' + (a.ownerName || '') : ''].join(' ').toLowerCase();
+      if (q && hay.indexOf(q) === -1) { continue; }
+      out += caseCard(c); n++;
+    }
+    $('case-count').textContent = n + ' case' + (n === 1 ? '' : 's') + ' shown';
+    $('case-list').innerHTML = out || emptyBox(state.cases.length ? 'No cases match your search.' : 'No cases reported yet.', state.cases.length ? '' : '#report', 'Report a case');
+  }
+  /* ---------- Veterinary decision support (rule-based, not validated) ---------- */
+  var OTH = ['Lameness', 'Pale gums', 'Nervous signs', 'Abortion', 'Weight loss', 'Swollen lymph nodes', 'None observed'];
+  var SIG_MAP = {
+    'Coughing': 'cough', 'Fast or laboured breathing': 'dyspnoea', 'Nasal discharge': 'nasal', 'Noisy breathing': 'noisy',
+    'Diarrhoea': 'diarrhoea', 'Constipation': 'constip', 'Bloating': 'bloat', 'Drooling': 'drool', 'Not chewing cud': 'nocud',
+    'Skin lumps or nodules': 'nodules', 'Wounds': 'wounds', 'Mouth sores': 'mouth', 'Foot or hoof sores': 'foot', 'Swelling': 'swell',
+    'Lameness': 'lame', 'Pale gums': 'pale', 'Nervous signs': 'nerv', 'Abortion': 'abort', 'Weight loss': 'wtloss', 'Swollen lymph nodes': 'nodes'
+  };
+  var SIG_LABEL = {
+    cough: 'coughing', dyspnoea: 'fast or laboured breathing', nasal: 'nasal discharge', noisy: 'noisy breathing',
+    diarrhoea: 'diarrhoea', constip: 'constipation', bloat: 'bloating', drool: 'drooling', nocud: 'not chewing cud',
+    nodules: 'skin lumps or nodules', wounds: 'wounds', mouth: 'mouth sores', foot: 'foot or hoof sores', swell: 'swelling',
+    lame: 'lameness', pale: 'pale gums', nerv: 'nervous signs', abort: 'abortion', wtloss: 'weight loss', nodes: 'swollen lymph nodes',
+    fever: 'raised temperature', nofever: 'temperature not raised', noapp: 'not eating', redapp: 'reduced appetite',
+    multi: 'several animals affected', death: 'deaths reported', short: 'short illness', long: 'long illness',
+    young: 'young animal', contact: 'new animals or herd contact', feedchg: 'recent feed or pasture change', vaxno: 'not vaccinated'
+  };
+  var ALL = ['Cattle', 'Goat', 'Sheep'];
+  var DX = [
+    { name: 'Foot-and-mouth disease', need: ['mouth', 'foot'], sp: ALL, rep: true,
+      rules: [['mouth', 3], ['foot', 3], ['drool', 2], ['lame', 2], ['fever', 1], ['multi', 2], ['contact', 1]],
+      tests: 'Vesicular epithelium or fluid for antigen ELISA or RT-PCR with serotyping; paired serology. Differentiate from PPR, orf and footrot.' },
+    { name: 'Lumpy skin disease', need: ['nodules'], sp: ['Cattle'], rep: true,
+      rules: [['nodules', 4], ['fever', 2], ['swell', 1], ['nasal', 1], ['nodes', 2], ['multi', 1]],
+      tests: 'Skin nodule biopsy or scab for PCR. Differentiate from dermatophilosis, insect bites and other nodular skin disease.' },
+    { name: 'Contagious bovine pleuropneumonia (CBPP)', need: ['cough', 'dyspnoea'], sp: ['Cattle'], rep: true,
+      rules: [['cough', 2], ['dyspnoea', 2], ['fever', 1], ['multi', 1], ['contact', 2], ['long', 1]],
+      tests: 'Pleural fluid or lung tissue for culture or PCR; herd serology (cELISA, CFT); lung lesions at post-mortem of any death.' },
+    { name: 'Respiratory infection (for example pasteurellosis)', need: ['cough', 'nasal', 'dyspnoea'], sp: ALL,
+      rules: [['cough', 2], ['nasal', 2], ['dyspnoea', 2], ['noisy', 1], ['fever', 2], ['multi', 1], ['young', 1]],
+      tests: 'Thoracic auscultation; nasal or deep nasopharyngeal swabs for culture and PCR; post-mortem and lung sampling if deaths occur.' },
+    { name: 'Blood parasites (trypanosomosis, babesiosis, anaplasmosis)', need: ['fever', 'pale', 'wtloss'], sp: ALL,
+      rules: [['fever', 2], ['pale', 3], ['redapp', 1], ['noapp', 1], ['wtloss', 2], ['long', 1], ['nodes', 1]],
+      tests: 'Thin and thick or buffy-coat smears (Giemsa); PCV; tick and tsetse exposure history; PCR or serology if smears are negative.' },
+    { name: 'Anthrax', need: ['death'], sp: ALL, rep: true,
+      rules: [['death', 3], ['short', 2], ['fever', 1], ['multi', 1], ['vaxno', 1]],
+      tests: 'Do not open the carcass. Peripheral blood smear (polychrome methylene blue) and confirmatory testing through the state veterinary authority. Zoonotic: protect people handling carcasses.' },
+    { name: 'Blackleg (clostridial myositis)', need: ['swell', 'lame', 'death'], sp: ['Cattle', 'Sheep'],
+      rules: [['swell', 2], ['death', 3], ['lame', 2], ['fever', 1], ['young', 1], ['vaxno', 1], ['short', 1]],
+      tests: 'Impression smears (FAT) or PCR from affected muscle; avoid opening carcasses in the open; check clostridial vaccination history.' },
+    { name: 'Bloat or rumen acidosis', need: ['bloat'], sp: ALL,
+      rules: [['bloat', 4], ['nocud', 2], ['diarrhoea', 1], ['feedchg', 2], ['noapp', 1], ['short', 1]],
+      tests: 'Detailed feed history; rumen fluid pH; assess for oesophageal obstruction; review access to grain, lush pasture or legumes.' },
+    { name: 'Gastrointestinal parasites or coccidiosis', need: ['diarrhoea', 'wtloss', 'pale'], sp: ALL,
+      rules: [['diarrhoea', 2], ['long', 2], ['redapp', 1], ['wtloss', 2], ['pale', 2], ['young', 1], ['multi', 1]],
+      tests: 'Faecal egg count (McMaster) and flotation for oocysts; mucous membrane colour or FAMACHA in small ruminants; PCV; review deworming history.' },
+    { name: 'Enteric infection (bacterial or viral)', need: ['diarrhoea'], sp: ALL,
+      rules: [['diarrhoea', 3], ['fever', 2], ['short', 1], ['young', 2], ['multi', 1], ['noapp', 1]],
+      tests: 'Faecal culture or PCR; rotavirus and coronavirus screening in young calves; assess hydration.' },
+    { name: 'Peste des petits ruminants (PPR)', need: ['mouth', 'nasal', 'diarrhoea'], sp: ['Goat', 'Sheep'], rep: true,
+      rules: [['mouth', 3], ['diarrhoea', 2], ['nasal', 2], ['cough', 1], ['dyspnoea', 1], ['fever', 2], ['multi', 2], ['death', 1], ['contact', 1], ['vaxno', 1]],
+      tests: 'Ocular, nasal and oral swabs for RT-PCR; antigen detection; cELISA serology; post-mortem lesions in deaths. Differentiate from orf, FMD and pneumonia.' },
+    { name: 'Contagious caprine pleuropneumonia (CCPP)', need: ['cough', 'dyspnoea'], sp: ['Goat'], rep: true,
+      rules: [['cough', 2], ['dyspnoea', 2], ['fever', 2], ['multi', 1], ['contact', 1], ['death', 1]],
+      tests: 'Lung tissue or pleural fluid for PCR or culture (Mycoplasma capricolum subsp. capripneumoniae); post-mortem of deaths.' },
+    { name: 'Sheep and goat pox', need: ['nodules'], sp: ['Goat', 'Sheep'], rep: true,
+      rules: [['nodules', 4], ['fever', 1], ['multi', 1], ['nodes', 1], ['contact', 1]],
+      tests: 'Scab or skin biopsy for PCR or electron microscopy. Differentiate from orf and dermatophilosis.' },
+    { name: 'Contagious ecthyma (orf)', need: ['mouth'], sp: ['Goat', 'Sheep'],
+      rules: [['mouth', 3], ['nodules', 1], ['wounds', 1], ['multi', 1], ['young', 2]],
+      tests: 'Clinical appearance supported by PCR; differentiate from PPR, FMD and pox. Zoonotic: wear gloves.' },
+    { name: 'Enterotoxaemia (clostridial)', need: ['death'], sp: ALL,
+      rules: [['death', 2], ['diarrhoea', 1], ['bloat', 1], ['feedchg', 2], ['short', 1], ['young', 1], ['vaxno', 2], ['noapp', 1], ['nerv', 1]],
+      tests: 'Intestinal contents for toxin detection or PCR; post-mortem findings; review clostridial vaccination and recent diet changes.' },
+    { name: 'Foot infection (footrot or interdigital necrobacillosis)', need: ['foot', 'lame'], sp: ALL,
+      rules: [['foot', 3], ['lame', 3], ['swell', 1], ['multi', 1], ['wounds', 1]],
+      tests: 'Examine and clean hooves; swabs for culture; if mouth lesions or fever in several animals, consider FMD.' },
+    { name: 'Poisoning (plants, chemicals, contaminated feed or water)', need: ['death', 'nerv'], sp: ALL,
+      rules: [['death', 2], ['multi', 2], ['short', 2], ['drool', 1], ['nerv', 2], ['bloat', 1], ['diarrhoea', 1], ['feedchg', 1], ['nofever', 1]],
+      tests: 'Detailed history of pasture, feed, water and chemical access; stomach contents, tissues and feed or water samples for toxicology.' },
+    { name: 'Neurological disease (heartwater, rabies, listeriosis, others)', need: ['nerv'], sp: ALL,
+      rules: [['nerv', 4], ['fever', 1], ['drool', 2], ['short', 1], ['death', 1]],
+      tests: 'Neurological examination; tick history and brain crush smear for heartwater; avoid contact with saliva until rabies is excluded; further tests by veterinary judgement.' },
+    { name: 'Abortion-associated disease (brucellosis, Rift Valley fever, others)', need: ['abort'], sp: ALL, rep: true,
+      rules: [['abort', 4], ['fever', 1], ['multi', 2], ['contact', 1]],
+      tests: 'Serology for brucellosis (RBT, ELISA); Rift Valley fever PCR or serology during outbreaks; fetal membranes and stomach contents for culture. Zoonotic: wear gloves.' }
+  ];
+
+  function isVet() { return state.role === 'Veterinary surgeon'; }
+
+  function signalsFor(c, a) {
+    var s = {}, i, all = [].concat(c.resp || [], c.dig || [], c.les || [], c.oth || []);
+    for (i = 0; i < all.length; i++) { if (SIG_MAP[all[i]]) { s[SIG_MAP[all[i]]] = true; } }
+    if (c.temp != null) {
+      if (Number(c.temp) >= (c.species === 'Cattle' ? 39.5 : 40.0)) { s.fever = true; } else { s.nofever = true; }
+    }
+    if (c.appetite === 'Not eating') { s.noapp = true; }
+    if (c.appetite === 'Reduced') { s.redapp = true; }
+    if (c.affected >= 2) { s.multi = true; }
+    if (c.deaths > 0) { s.death = true; }
+    if (c.durUnit === 'hours' || (c.durUnit === 'days' && c.durValue <= 2)) { s.short = true; }
+    if (c.durUnit === 'weeks' || (c.durUnit === 'days' && c.durValue >= 7)) { s.long = true; }
+    if (a && a.ageUnit === 'months' && a.ageValue <= 6) { s.young = true; }
+    if (c.contact === 'Yes') { s.contact = true; }
+    if (c.vacc === 'Not vaccinated') { s.vaxno = true; }
+    if (/feed|grain|forage|pasture|graz|moved|new animal|introduc/i.test(c.notes || '')) { s.feedchg = true; }
+    return s;
+  }
+  function dxResults(c, a) {
+    var sig = signalsFor(c, a), out = [], i, j;
+    for (i = 0; i < DX.length; i++) {
+      var d = DX[i];
+      if (d.sp.indexOf(c.species) === -1) { continue; }
+      var okNeed = !d.need, k;
+      for (k = 0; d.need && k < d.need.length; k++) { if (sig[d.need[k]]) { okNeed = true; } }
+      if (!okNeed) { continue; }
+      var score = 0, hits = [];
+      for (j = 0; j < d.rules.length; j++) {
+        if (sig[d.rules[j][0]]) { score += d.rules[j][1]; hits.push(SIG_LABEL[d.rules[j][0]]); }
+      }
+      if (score >= 4) { out.push({ d: d, score: score, hits: hits }); }
+    }
+    out.sort(function (x, y) { return y.score - x.score; });
+    return out.slice(0, 6);
+  }
+  function dxPanel(c, a) {
+    var res = dxResults(c, a), i, h = '<div class="card" style="border-color:#B9A24A"><h3>Veterinary decision support</h3>' +
+      '<div class="hint" style="margin:0 0 6px">For veterinary surgeons. Possibilities to consider, ranked by how many recorded signs overlap. Built from simple rules and not validated. It is not a diagnosis. Confirm with your own examination and tests.</div>';
+    if (!res.length) {
+      h += '<div style="margin:10px 0">The recorded signs do not strongly match any condition in this prototype list. Rely on clinical examination and further history.</div>';
+    }
+    for (i = 0; i < res.length; i++) {
+      var r = res[i], lvl = r.score >= 8 ? 'Stronger overlap' : (r.score >= 5 ? 'Moderate overlap' : 'Some overlap');
+      h += '<div class="dx"><div class="cc-top"><b>' + esc(r.d.name) + '</b></div>' +
+        '<span class="badge ' + (r.score >= 8 ? 'b-open' : 'b-rev') + '">' + lvl + '</span>' +
+        (r.d.rep ? '<div class="hint" style="margin:6px 0 0">Possible reportable disease: check reporting rules with the state veterinary authority.</div>' : '') +
+        '<div class="cc-meta">Fits because: ' + esc(r.hits.join(', ')) + '</div>' +
+        '<div style="margin-top:6px"><b>Tests to consider:</b> ' + esc(r.d.tests) + '</div></div>';
+    }
+    h += '<div class="dx"><b>Baseline work-up to consider</b><div class="cc-meta">Full clinical examination (temperature, pulse, respiration, mucous membranes, hydration, body condition), herd history, vaccination and deworming records, recent animal movements and biosecurity.</div></div>';
+    if (c.deaths > 0 || c.affected > 1) {
+      h += '<div class="dx"><b>Herd-level flag</b><div class="cc-meta">Several animals affected or deaths reported. Consider a herd-level cause, handle carcasses with care until anthrax is excluded, and consider notifying the state veterinary authority if a reportable disease is suspected.</div></div>';
+    }
+    return h + '</div>';
+  }
+  function taField(id, label, val, hint) {
+    return '<div class="field"><label class="lbl" for="' + id + '">' + esc(label) + '</label><textarea id="' + id + '">' + esc(val || '') + '</textarea>' + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + '</div>';
+  }
+  function vetSection(c, a) {
+    var n = c.vetNotes || {}, h = '', ow = a ? a : null;
+    if (isVet()) {
+      h += dxPanel(c, a);
+      h += '<div class="card"><h3>Your assessment and plan</h3>' +
+        taField('va-dx', 'Working diagnosis or differentials', n.dx) +
+        taField('va-tests', 'Tests requested', n.tests) +
+        taField('va-plan', 'Plan and advice to the farmer', n.plan, 'Write the treatment plan and any doses yourself. This app does not suggest them.') +
+        '<button type="button" class="btn alt sm" data-save-assess="' + esc(c.ref) + '">Save assessment</button>' +
+        '<button type="button" class="btn wa sm" data-send-advice="' + esc(c.ref) + '" style="margin:0">' +
+        (ow && ow.ownerPhone ? 'Send advice to ' + esc(ow.ownerName || 'owner') + ' on WhatsApp' : 'Send advice on WhatsApp') + '</button></div>';
+    } else {
+      h += '<div class="card"><h3>Veterinary advice</h3>';
+      if (n.dx || n.tests) {
+        h += '<div class="kv">' + (n.dx ? kv('Assessment', esc(n.dx)) : '') + (n.tests ? kv('Tests requested', esc(n.tests)) : '') + '</div><div style="height:10px"></div>';
+      }
+      h += taField('va-plan', 'Advice from your veterinary surgeon', n.plan, 'When your veterinary surgeon replies on WhatsApp, paste the reply here so it stays with this case.') +
+        '<button type="button" class="btn alt sm" data-save-assess="' + esc(c.ref) + '" style="margin:0">Save advice</button>' +
+        '<div class="hint" style="margin-top:10px">Veterinary surgeon? Switch to "Veterinary surgeon" on the Home page to see decision support.</div></div>';
+    }
+    return h;
+  }
+  function saveAssess(c) {
+    var n = c.vetNotes || {};
+    if ($('va-dx')) { n.dx = $('va-dx').value.trim(); }
+    if ($('va-tests')) { n.tests = $('va-tests').value.trim(); }
+    if ($('va-plan')) { n.plan = $('va-plan').value.trim(); }
+    n.at = nowISO();
+    c.vetNotes = n;
+    save();
+  }
+  function adviceText(c) {
+    var n = c.vetNotes || {}, L = [];
+    L.push('Veterinary advice for case ' + c.ref + ' (animal ' + c.animalId + ')');
+    if (n.dx) { L.push('Assessment: ' + n.dx); }
+    if (n.tests) { L.push('Tests requested: ' + n.tests); }
+    if (n.plan) { L.push('Plan and advice: ' + n.plan); }
+    L.push('If more animals become sick or die, contact your veterinary surgeon straight away.');
+    L.push('Sent with AgriSentinel AI (early prototype).');
+    return L.join('\n');
+  }
+
+  function caseSummary(c, a) {
+    var L = [];
+    L.push((c.sample ? '[SAMPLE] ' : '') + 'Livestock case ' + c.ref + ' (' + c.status + ')');
+    L.push('Animal: ' + c.animalId + ' - ' + c.species + (a ? ', ' + a.breed + ', ' + a.sex + ', ' + ageText(a) : ''));
+    if (a) {
+      L.push('Location: ' + a.location);
+      L.push('Owner: ' + (a.ownerName || 'not recorded') + (a.ownerPhone ? ' (' + a.ownerPhone + ')' : ''));
+    }
+    L.push('Ill for: ' + durText(c));
+    L.push('Appetite: ' + c.appetite);
+    L.push('Measured temperature: ' + tempText(c));
+    L.push('Respiratory signs: ' + listText(c.resp));
+    L.push('Digestive signs: ' + listText(c.dig));
+    L.push('Visible lesions: ' + listText(c.les) + (c.lesDesc ? ' (' + c.lesDesc + ')' : ''));
+    if (c.oth && c.oth.length) { L.push('Other signs: ' + c.oth.join(', ')); }
+    if (c.vacc && c.vacc !== 'Unknown') { L.push('Vaccination: ' + c.vacc); }
+    if (c.contact && c.contact !== 'Unknown') { L.push('New animals or herd contact in last 3 weeks: ' + c.contact); }
+    L.push('Animals affected: ' + c.affected + ', deaths: ' + c.deaths);
+    if (c.notes) { L.push('Notes: ' + c.notes); }
+    L.push('Reported: ' + fmtDate(c.created));
+    L.push('Recorded with AgriSentinel AI (early prototype). This is not a diagnosis.');
+    return L.join('\n');
+  }
+  function renderCaseDetail(ref) {
+    var c = getCase(ref), box = $('case-detail');
+    if (!c) {
+      box.innerHTML = '<a class="back" href="#cases">\u2039 All cases</a>' + emptyBox('This case could not be found. It may have been deleted.');
+      return;
+    }
+    var a = getAnimal(c.animalId), i, html;
+    html = '<a class="back" href="#cases">\u2039 All cases</a>' +
+      '<div class="card"><div class="cc-top"><h1 class="page" style="margin:0">' + esc(c.ref) + sampleTag(c) + '</h1>' + badge(c.status) + '</div>' +
+      '<div style="margin:6px 0">' + etag(c.animalId) + '</div>';
+    if (c.deaths > 0) { html += '<span class="info">Deaths reported</span>'; }
+    if (c.affected > 1) { html += '<span class="info">Several animals affected</span>'; }
+    if (c.deaths > 0 || c.affected > 1) { html += '<div class="hint" style="margin-top:8px">Contact a veterinary surgeon for assessment.</div>'; }
+    html += '<dl class="kv">' +
+      kv('Reported', esc(fmtDate(c.created))) +
+      kv('Species', esc(c.species) + (a ? ' \u00B7 ' + esc(a.breed) : '')) +
+      (a ? kv('Animal', esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + '<br>' + esc(a.location)) : kv('Animal', 'Not registered')) +
+      (a ? kv('Owner', esc(a.ownerName || 'Not recorded') + (a.ownerPhone ? '<br>' + phoneLinks(a.ownerPhone) : '')) : '') +
+      kv('Veterinary surgeon', (c.vetName || c.vetPhone) ? esc(c.vetName || 'Name not recorded') + (c.vetPhone ? '<br>' + phoneLinks(c.vetPhone) : '') : 'Not assigned yet') +
+      kv('Illness so far', esc(durText(c))) +
+      kv('Appetite', esc(c.appetite)) +
+      kv('Measured temperature', esc(tempText(c))) +
+      kv('Respiratory signs', esc(listText(c.resp))) +
+      kv('Digestive signs', esc(listText(c.dig))) +
+      kv('Visible lesions', esc(listText(c.les)) + (c.lesDesc ? '<br>' + esc(c.lesDesc) : '')) +
+      kv('Other signs', esc(listText(c.oth || []))) +
+      kv('Vaccination status', esc(c.vacc || 'Unknown')) +
+      kv('New animals or herd contact (3 weeks)', esc(c.contact || 'Unknown')) +
+      kv('Animals affected', esc(c.affected)) +
+      kv('Deaths', esc(c.deaths)) +
+      kv('Additional observations', c.notes ? esc(c.notes) : 'None recorded') +
+      '</dl></div>';
+
+    html += vetSection(c, a);
+    html += '<div class="card"><h3>Update status</h3>';
+    for (i = 0; i < STATUSES.length; i++) {
+      var on = c.status === STATUSES[i];
+      html += '<button type="button" class="btn' + (on ? '' : ' alt') + '" data-set-status="' + esc(STATUSES[i]) + '" data-ref="' + esc(c.ref) + '"' + (on ? ' disabled style="opacity:1"' : '') + '>' + (on ? '\u2713 ' : '') + esc(STATUSES[i]) + '</button>';
+    }
+    html += '</div>';
+
+    html += '<div class="card"><h3>Status history</h3><ul class="hist">';
+    for (i = c.history.length - 1; i >= 0; i--) {
+      html += '<li>' + badge(c.history[i].status) + ' <span class="hint">' + esc(fmtDate(c.history[i].at)) + '</span></li>';
+    }
+    html += '</ul></div>';
+
+    var msg = encodeURIComponent(caseSummary(c, a));
+    html += '<div class="card"><h3>Share this case</h3>' +
+      '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + msg + '">Share on WhatsApp</a>';
+    if (c.vetPhone) {
+      html += '<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/' + esc(waNumber(c.vetPhone)) + '?text=' + msg + '">Send to ' + esc(c.vetName || 'veterinary surgeon') + '</a>';
+    }
+    html += '<div class="hint">Opens WhatsApp with the case summary ready to send.</div></div>';
+
+    html += '<div class="card"><h3>Veterinary surgeon</h3>' +
+      '<div class="field"><input type="text" id="v-name" value="' + esc(c.vetName || '') + '" placeholder="Name" aria-label="Veterinary surgeon name"></div>' +
+      '<div class="field"><input type="text" id="v-phone" inputmode="tel" value="' + esc(c.vetPhone || '') + '" placeholder="Phone" aria-label="Veterinary surgeon phone"><div class="err" id="e-v-phone" hidden></div></div>' +
+      '<button type="button" class="btn alt sm" data-save-vet="' + esc(c.ref) + '" style="margin:0">Save veterinary surgeon</button></div>';
+
+    html += '<div class="notice"><b>Record only</b>This page does not diagnose disease or recommend treatment. A veterinary surgeon should assess the animals.</div>' +
+      '<button type="button" class="btn danger sm" data-delete-case="' + esc(c.ref) + '">Delete this case</button>';
+    box.innerHTML = html;
+  }
+
+  /* ---------- 5. Health records ---------- */
+  var openRec = {};
+  function recordList() {
+    var list = state.animals.slice(), seen = {}, i;
+    for (i = 0; i < list.length; i++) { seen[list[i].id] = true; }
+    for (i = 0; i < state.cases.length; i++) {
+      var c = state.cases[i];
+      if (!seen[c.animalId]) { seen[c.animalId] = true; list.push({ id: c.animalId, species: c.species, unregistered: true }); }
+    }
+    return list;
+  }
+  function renderRecords() {
+    var q = $('rec-search').value.toLowerCase().trim(), list = recordList(), out = '', shown = 0;
+    for (var i = 0; i < list.length; i++) {
+      var a = list[i];
+      var hay = [a.id, a.species, a.breed, a.location, a.sex, a.ownerName].join(' ').toLowerCase();
+      if (q && hay.indexOf(q) === -1) { continue; }
+      shown++;
+      var cases = sortedCases().filter(function (c) { return c.animalId === a.id; });
+      var isOpen = !!openRec[a.id];
+      var line = a.unregistered ? esc(a.species) + ' \u00B7 not registered' : esc(a.species) + ' \u00B7 ' + esc(a.breed) + '<br>' + esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + ' \u00B7 ' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded');
+      out += '<div class="card"><button type="button" class="rec-head" data-toggle="' + esc(a.id) + '" aria-expanded="' + isOpen + '">' +
+        '<div class="cc-top"><span>' + etag(a.id) + sampleTag(a) + '</span><span class="badge b-ok" style="background:#EEF2EC;color:#2E3F35">' + cases.length + ' case' + (cases.length === 1 ? '' : 's') + (isOpen ? ' \u25B2' : ' \u25BC') + '</span></div>' +
+        '<div class="cc-meta">' + line + '</div></button>';
+      if (isOpen) {
+        out += '<div class="rec-body"><h3 style="font-size:17px;margin-bottom:6px">Clinical case history</h3>';
+        if (!cases.length) { out += '<div class="hint">No cases reported for this animal.</div>'; }
+        for (var j = 0; j < cases.length; j++) {
+          var c2 = cases[j];
+          out += '<a class="rec-link" href="#cases/' + encodeURIComponent(c2.ref) + '"><b>' + esc(c2.ref) + '</b>' + sampleTag(c2) + ' ' + badge(c2.status) +
+            '<div class="cc-meta">' + esc(fmtDate(c2.created)) + ' \u00B7 ill ' + esc(durText(c2)) + ' \u00B7 appetite ' + esc(c2.appetite.toLowerCase()) + ' \u00B7 ' + esc(tempText(c2)) +
+            '<br>Affected ' + c2.affected + ' \u00B7 Deaths ' + c2.deaths + '</div></a>';
+        }
+        out += '<div style="margin-top:12px"><button type="button" class="btn sm" data-report-for="' + esc(a.id) + '" style="margin:0">Report a case for this animal</button></div></div>';
+      }
+      out += '</div>';
+    }
+    $('rec-list').innerHTML = out || emptyBox(state.animals.length ? 'No animals match your search.' : 'No animals registered yet.', state.animals.length ? '' : '#register', 'Register an animal');
+  }
+
+  /* ---------- Routing ---------- */
+  var VIEWS = ['dashboard', 'register', 'report', 'cases', 'records'];
+  function route() {
+    var parts = (location.hash || '#dashboard').slice(1).split('/');
+    var v = VIEWS.indexOf(parts[0]) >= 0 ? parts[0] : 'dashboard';
+    var arg = parts[1] ? decodeURIComponent(parts[1]) : '';
+    var i, links = $('nav').getElementsByTagName('a');
+    for (i = 0; i < VIEWS.length; i++) { $('view-' + VIEWS[i]).hidden = VIEWS[i] !== v; }
+    for (i = 0; i < links.length; i++) { links[i].className = links[i].getAttribute('data-v') === v ? 'on' : ''; }
+
+    if (v === 'dashboard') { renderDashboard(); }
+    if (v === 'register') { fillBreeds(); renderRecentAnimals(); }
+    if (v === 'report') {
+      fillAnimalList();
+      if (pendingReportId) { $('r-animal').value = pendingReportId; pendingReportId = ''; }
+      lookupAnimal();
+    }
+    if (v === 'cases') {
+      if (arg) { $('cases-list-wrap').hidden = true; $('case-detail').hidden = false; renderCaseDetail(arg); }
+      else { $('cases-list-wrap').hidden = false; $('case-detail').hidden = true; renderFilters(); renderCaseList(); }
+    }
+    if (v === 'records') { renderRecords(); }
+    window.scrollTo(0, 0);
+  }
+  var pendingReportId = '';
+  window.addEventListener('hashchange', route);
+
+  /* ---------- Click handling ---------- */
+  function findAttr(el, attr) {
+    while (el && el !== document) {
+      if (el.getAttribute && el.getAttribute(attr) !== null) { return el; }
+      el = el.parentNode;
+    }
+    return null;
+  }
+  document.addEventListener('click', function (e) {
+    var t;
+    if ((t = findAttr(e.target, 'data-filter'))) {
+      caseFilter = t.getAttribute('data-filter');
+      if (t.tagName === 'A') { return; } /* dashboard tile: let the link navigate, filter is applied */
+      renderFilters(); renderCaseList(); return;
+    }
+    if ((t = findAttr(e.target, 'data-set-status'))) {
+      var c = getCase(t.getAttribute('data-ref')), s = t.getAttribute('data-set-status');
+      if (c && c.status !== s) {
+        c.status = s; c.history.push({ status: s, at: nowISO() }); save();
+        renderCaseDetail(c.ref); toast('Status updated: ' + s);
+      }
+      return;
+    }
+    if ((t = findAttr(e.target, 'data-save-assess'))) {
+      var ac = getCase(t.getAttribute('data-save-assess'));
+      if (ac) { saveAssess(ac); renderCaseDetail(ac.ref); toast('Saved'); }
+      return;
+    }
+    if ((t = findAttr(e.target, 'data-send-advice'))) {
+      var sc = getCase(t.getAttribute('data-send-advice'));
+      if (sc) {
+        saveAssess(sc);
+        var oa = getAnimal(sc.animalId), num = oa && oa.ownerPhone ? waNumber(oa.ownerPhone) : '';
+        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(adviceText(sc)), '_blank');
+        renderCaseDetail(sc.ref);
+      }
+      return;
+    }
+    if ((t = findAttr(e.target, 'data-save-vet'))) {
+      var vc = getCase(t.getAttribute('data-save-vet')), vn = $('v-name').value.trim(), vp = $('v-phone').value.trim();
+      $('e-v-phone').hidden = true;
+      if (vp && !phoneOK(vp)) { $('e-v-phone').textContent = 'Enter a phone number with 10 to 15 digits, or leave it blank.'; $('e-v-phone').hidden = false; return; }
+      if (vc) { vc.vetName = vn; vc.vetPhone = vp; save(); renderCaseDetail(vc.ref); toast('Veterinary surgeon saved'); }
+      return;
+    }
+    if ((t = findAttr(e.target, 'data-delete-case'))) {
+      if (window.confirm('Delete case ' + t.getAttribute('data-delete-case') + '? This cannot be undone.')) {
+        var ref = t.getAttribute('data-delete-case');
+        state.cases = state.cases.filter(function (x) { return x.ref !== ref; });
+        save(); toast('Case deleted'); location.hash = '#cases';
+      }
+      return;
+    }
+    if ((t = findAttr(e.target, 'data-toggle'))) {
+      var id = t.getAttribute('data-toggle');
+      openRec[id] = !openRec[id]; renderRecords(); return;
+    }
+    if ((t = findAttr(e.target, 'data-report-for'))) {
+      pendingReportId = t.getAttribute('data-report-for'); location.hash = '#report'; return;
+    }
+    if (e.target.id === 'btn-rm-sample') {
+      if (window.confirm('Remove all sample animals and cases? Records you added stay.')) {
+        state.animals = state.animals.filter(function (a) { return !a.sample; });
+        state.cases = state.cases.filter(function (c) { return !c.sample; });
+        save(); renderDashboard(); toast('Sample data removed');
+      }
+      return;
+    }
+    if (e.target.id === 'btn-reset') {
+      if (window.confirm('Delete ALL animals and cases stored on this device? This cannot be undone.')) {
+        state = { animals: [], cases: [], nextCase: 1 }; save(); openRec = {}; renderDashboard(); toast('All records deleted');
+      }
+    }
+  });
+  $('case-search').addEventListener('input', renderCaseList);
+  $('rec-search').addEventListener('input', renderRecords);
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'role') { state.role = e.target.value; save(); toast('Using the app as: ' + e.target.value); }
+  });
+
+  /* ---------- Start ---------- */
+  buildChecks('g-resp', 'r-resp', RESP);
+  buildChecks('g-dig', 'r-dig', DIG);
+  buildChecks('g-les', 'r-les', LES);
+  buildChecks('g-oth', 'r-oth', OTH);
+  fillAnimalList();
+  $('foot').innerHTML = 'AgriSentinel AI is an early prototype. Built by ' + esc(BUILDER) + '.<br>Feedback: <a href="tel:' + FEEDBACK_PHONE + '">' + FEEDBACK_PHONE + '</a> \u00B7 <a href="https://wa.me/' + waNumber(FEEDBACK_PHONE) + '" target="_blank" rel="noopener">WhatsApp</a> \u00B7 <a href="mailto:' + FEEDBACK_EMAIL + '">' + FEEDBACK_EMAIL + '</a>';
+  route();
+
+  if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>

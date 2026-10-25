@@ -77,7 +77,7 @@ h2.sec{font-size:19px;margin:22px 0 10px}
 .field{margin-bottom:18px}
 .lbl{display:block;font-weight:700;margin-bottom:6px}
 .hint{color:var(--muted);font-size:14.5px;margin-top:4px}
-input[type=text],input[type=number],input[type=search],select,textarea{width:100%;min-height:52px;font-family:inherit;font-size:17px;color:var(--ink);padding:12px;border:2px solid #9FB5A0;border-radius:10px;background:#fff;-webkit-appearance:none;appearance:none}
+input[type=text],input[type=number],input[type=search],input[type=email],input[type=password],input[type=tel],select,textarea{width:100%;min-height:52px;font-family:inherit;font-size:17px;color:var(--ink);padding:12px;border:2px solid #9FB5A0;border-radius:10px;background:#fff;-webkit-appearance:none;appearance:none}
 select{background-image:linear-gradient(45deg,transparent 50%,#4F6157 50%),linear-gradient(135deg,#4F6157 50%,transparent 50%);background-position:calc(100% - 20px) 22px,calc(100% - 14px) 22px;background-size:6px 6px,6px 6px;background-repeat:no-repeat;padding-right:36px}
 select:disabled{background-color:#EEF2EC;color:#3A4A40}
 textarea{min-height:110px;resize:vertical}
@@ -129,6 +129,28 @@ input:focus,select:focus,textarea:focus{outline:3px solid #BFE3CB;border-color:v
 a.btn.alt{color:var(--green)}
 .dx{border-top:1px solid #E3EBE0;padding:12px 0}
 .dx .badge{margin-top:2px}
+.noauth .nav{display:none}
+body.noauth{padding-bottom:24px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;grid-gap:8px;gap:8px;margin-bottom:14px}
+.tabs button{min-height:52px;border:2px solid #9FB5A0;border-radius:10px;background:#fff;font-family:inherit;font-size:17px;font-weight:700;color:var(--ink);cursor:pointer}
+.tabs button.on{background:var(--green);border-color:var(--green);color:#fff}
+.check{display:flex;align-items:flex-start;font-weight:500;cursor:pointer}
+.check input{width:28px;height:28px;flex:0 0 28px;margin:2px 12px 0 0}
+details.more{margin-top:10px;border-top:1px solid #E3EBE0;padding-top:4px}
+details.more summary{min-height:48px;display:flex;align-items:center;font-weight:700;color:var(--green2);cursor:pointer}
+.msg{max-width:90%;padding:10px 12px;border-radius:14px;margin:0 0 8px;word-break:break-word;white-space:pre-wrap}
+.msg.me{background:#DCF0E1;margin-left:auto;border-bottom-right-radius:4px}
+.msg.them{background:#F1F3EF;border:1px solid var(--line);margin-right:auto;border-bottom-left-radius:4px}
+.msg small{display:block;color:var(--muted);font-size:13px;margin-bottom:2px;white-space:normal}
+.btn:disabled{cursor:default}
+
+.loading{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(232,239,228,.95);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--green);font-size:18px;z-index:40}
+.rolebadge{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:700;font-size:14px;background:#E3F0E6;color:var(--green)}
+.banner{border-radius:12px;padding:12px 14px;margin-bottom:14px;font-weight:600;line-height:1.4}
+.banner.warn{background:#FFF1BF;color:#4A3800;border:1px solid #E3CF86}
+.banner.info{background:#E3F0E6;color:#14442E;border:1px solid #B5DCC0}
+.banner.bad{background:var(--openbg);color:var(--open);border:1px solid #EBC3BC}
+.btn[disabled]{opacity:.6}
 </style>
 </head>
 <body>
@@ -138,33 +160,87 @@ a.btn.alt{color:var(--green)}
   <span class="proto">Prototype</span>
 </div></header>
 <div class="strip"><div><b>Early prototype.</b> Records information only. It does not diagnose disease and does not replace professional veterinary assessment.</div></div>
-<div class="warnbar" id="store-warn" hidden>Browser storage is unavailable here (private mode or blocked). Records will be lost when you refresh or close this page.</div>
+<div class="warnbar" id="net-warn" hidden>You are offline. Changes cannot be saved until your internet connection is back.</div>
 
 <main class="wrap">
+
+<!-- SIGN IN / CREATE ACCOUNT -->
+<section id="view-auth" hidden>
+  <h1 class="page">Welcome</h1>
+  <p class="lead">Farmers report cases. Veterinary surgeons respond. Sign in or create an account.</p>
+  <div id="auth-notice"></div>
+  <div class="chips" id="auth-tabs">
+    <button type="button" data-auth="in" class="on">Sign in</button>
+    <button type="button" data-auth="up">Create account</button>
+  </div>
+
+  <form id="form-signin" class="card" novalidate>
+    <div class="field"><label class="lbl" for="si-email">Email</label>
+      <input type="email" id="si-email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="you@example.com">
+      <div class="err" id="e-si-email" hidden></div></div>
+    <div class="field"><label class="lbl" for="si-pass">Password</label>
+      <input type="password" id="si-pass" autocomplete="current-password">
+      <label class="hint" style="display:block;margin-top:8px"><input type="checkbox" id="si-show"> Show password</label>
+      <div class="err" id="e-si-pass" hidden></div></div>
+    <div class="err" id="e-form-signin" hidden style="margin:0 0 10px"></div>
+    <button type="submit" class="btn">Sign in</button>
+  </form>
+
+  <form id="form-signup" class="card" novalidate hidden>
+    <div class="field"><label class="lbl" for="su-name">Full name</label>
+      <input type="text" id="su-name" autocomplete="name">
+      <div class="err" id="e-su-name" hidden></div></div>
+    <div class="field"><label class="lbl" for="su-phone">Phone number (WhatsApp)</label>
+      <input type="text" id="su-phone" inputmode="tel" autocomplete="tel" placeholder="e.g. 0803 000 0000">
+      <div class="hint">So your veterinary surgeon or farmer can call or message you.</div>
+      <div class="err" id="e-su-phone" hidden></div></div>
+    <div class="field"><label class="lbl" for="su-email">Email</label>
+      <input type="email" id="su-email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com">
+      <div class="err" id="e-su-email" hidden></div></div>
+    <div class="field"><label class="lbl" for="su-pass">Password</label>
+      <input type="password" id="su-pass" autocomplete="new-password">
+      <div class="hint">At least 8 characters.</div>
+      <label class="hint" style="display:block;margin-top:8px"><input type="checkbox" id="su-show"> Show password</label>
+      <div class="err" id="e-su-pass" hidden></div></div>
+    <div class="field"><span class="lbl">I am a</span>
+      <div class="seg"><label><input type="radio" name="su-role" value="farmer" checked><span>Farmer</span></label><label><input type="radio" name="su-role" value="vet"><span>Veterinary surgeon</span></label></div></div>
+    <div class="field" id="su-vcn-wrap" hidden><label class="lbl" for="su-vcn">VCN registration number</label>
+      <input type="text" id="su-vcn" autocapitalize="characters">
+      <div class="hint">Used to approve your veterinary account. Until it is approved you use the app as a farmer.</div>
+      <div class="err" id="e-su-vcn" hidden></div></div>
+    <div class="hint" style="margin-bottom:14px">Your name and phone number are shown to the veterinary surgeon who takes your case. Cases that no veterinary surgeon has taken yet are visible to approved veterinary surgeons.</div>
+    <div class="err" id="e-form-signup" hidden style="margin:0 0 10px"></div>
+    <button type="submit" class="btn">Create account</button>
+  </form>
+</section>
+
+<!-- LOAD ERROR -->
+<section id="view-error" hidden>
+  <h1 class="page">Could not load your records</h1>
+  <p class="lead" id="err-text"></p>
+  <button type="button" class="btn" id="btn-retry">Try again</button>
+  <button type="button" class="btn alt" id="btn-err-out">Sign out</button>
+</section>
+
+<div id="app" hidden>
 
 <!-- 1. DASHBOARD -->
 <section id="view-dashboard" class="view">
   <h1 class="page">Dashboard</h1>
   <p class="lead">Cattle, goats and sheep at a glance.</p>
-
+  <div class="card" id="acct-card"></div>
   <div class="notice">
     <b>Not a diagnostic tool</b>
     AgriSentinel AI helps you record and track animal health problems. It does not diagnose diseases, prescribe medicines or give treatment doses. If animals are very sick or dying, contact a veterinary surgeon straight away.
   </div>
-
-  <div class="card" id="role-card"></div>
-  <div id="sample-info" class="sampleinfo" hidden></div>
+  <div id="vet-wait"></div>
   <div class="tiles" id="tiles"></div>
   <div id="review-line" class="hint" style="margin:-2px 0 14px"></div>
-
+  <div id="import-card"></div>
   <a class="btn" href="#report">Report a sick animal</a>
   <a class="btn alt" href="#register">Register an animal</a>
-
   <h2 class="sec">Latest cases</h2>
   <div id="dash-recent"></div>
-
-  <h2 class="sec">Data</h2>
-  <button type="button" class="btn danger sm" id="btn-reset">Delete all records on this device</button>
 </section>
 
 <!-- 2. ANIMAL REGISTRATION -->
@@ -201,10 +277,10 @@ a.btn.alt{color:var(--green)}
       <input type="text" id="a-ownerphone" inputmode="tel" placeholder="e.g. 0803 000 0000">
       <div class="hint">Used for calling or WhatsApp.</div>
       <div class="err" id="e-a-ownerphone" hidden></div></div>
+    <div class="err" id="e-form-register" hidden style="margin:0 0 10px"></div>
     <button type="submit" class="btn">Save animal</button>
   </form>
   <datalist id="breed-list"></datalist>
-
   <h2 class="sec">Recently registered</h2>
   <div id="recent-animals"></div>
 </section>
@@ -254,11 +330,9 @@ a.btn.alt{color:var(--green)}
         <div><label class="hint" for="r-dead" style="margin:0 0 4px;display:block">Deaths</label><input type="number" id="r-dead" inputmode="numeric" min="0" value="0"></div>
       </div>
       <div class="err" id="e-r-aff" hidden></div></div>
-    <div class="field"><span class="lbl">Veterinary surgeon (optional)</span>
-      <div class="two"><input type="text" id="r-vet" placeholder="Name" aria-label="Veterinary surgeon name"><input type="text" id="r-vetphone" inputmode="tel" placeholder="Phone" aria-label="Veterinary surgeon phone"></div>
-      <div class="err" id="e-r-vet" hidden></div></div>
     <div class="field"><label class="lbl" for="r-notes">Additional observations</label>
       <textarea id="r-notes" placeholder="Recent movement, new animals, feed or water changes, vaccination status, anything else"></textarea></div>
+    <div class="err" id="e-form-report" hidden style="margin:0 0 10px"></div>
     <button type="submit" class="btn">Submit case</button>
   </form>
 </section>
@@ -284,12 +358,14 @@ a.btn.alt{color:var(--green)}
   <div id="rec-list"></div>
 </section>
 
+</div>
 </main>
+
 <footer class="foot" id="foot"></footer>
-
 <div class="toast" id="toast" hidden></div>
+<div class="loading" id="loading">Loading&hellip;</div>
 
-<nav class="nav" id="nav" aria-label="Main">
+<nav class="nav" id="nav" aria-label="Main" hidden>
   <a href="#dashboard" data-v="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Home</a>
   <a href="#register" data-v="register"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>Register</a>
   <a href="#report" data-v="report"><svg viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>Report</a>
@@ -301,36 +377,23 @@ a.btn.alt{color:var(--green)}
 (function () {
   'use strict';
 
-  /* ---------- Storage (localStorage with in-memory fallback) ---------- */
-  var KEY = 'agrisentinel_prototype_v1';
-  var storageOK = true;
-  try { localStorage.setItem('__as_test', '1'); localStorage.removeItem('__as_test'); } catch (e) { storageOK = false; }
+  /* ---------- Settings ---------- */
+  var SB_URL = 'https://vaigexpugncgkzhqpsed.supabase.co';
+  var SB_KEY = 'sb_publishable_09kaJWmNcbxL5p5isdZ_uA_dG2Ufzcc'; /* public key, safe in the browser */
+  var AUTH_KEY = 'agrisentinel_auth_v1';
+  var LOCAL_KEY = 'agrisentinel_prototype_v1';
+  var IMPORT_KEY = 'agrisentinel_import_done_for';
+  var BUILDER = 'Dr. Mansur Nuhu', FEEDBACK_PHONE = '08062246974', FEEDBACK_EMAIL = 'mansurnuhu55@gmail.com';
 
-  function readStore() {
-    if (!storageOK) { return null; }
-    try {
-      var raw = localStorage.getItem(KEY);
-      var s = raw ? JSON.parse(raw) : null;
-      if (s && Array.isArray(s.animals) && Array.isArray(s.cases)) { return s; }
-    } catch (e) {}
-    return null;
-  }
-  function save() {
-    if (!storageOK) { return; }
-    try { localStorage.setItem(KEY, JSON.stringify(state)); }
-    catch (e) { storageOK = false; $('store-warn').hidden = false; }
-  }
-
-  /* ---------- Helpers ---------- */
+  /* ---------- Small helpers ---------- */
   function $(id) { return document.getElementById(id); }
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function pad(n, w) { var s = String(n); while (s.length < w) { s = '0' + s; } return s; }
   function nowISO() { return new Date().toISOString(); }
-  function daysAgo(n) { var d = new Date(); d.setDate(d.getDate() - n); return d.toISOString(); }
+  function nowSec() { return Math.floor(Date.now() / 1000); }
   function fmtDate(iso) {
     var d = new Date(iso);
     if (isNaN(d.getTime())) { return ''; }
@@ -338,32 +401,23 @@ a.btn.alt{color:var(--green)}
   }
   function normId(s) { return String(s || '').replace(/\s+/g, ' ').trim().toUpperCase(); }
   function listText(arr) { return arr && arr.length ? arr.join(', ') : 'None recorded'; }
-
-  var BUILDER = 'Dr. Mansur Nuhu';
-  var FEEDBACK_PHONE = '08062246974', FEEDBACK_EMAIL = 'mansurnuhu55@gmail.com';
-  function cleanPhone(p) { return String(p || '').replace(/[^\d+]/g, ''); }
-  function phoneOK(p) { var d = String(p || '').replace(/\D/g, ''); return d.length >= 10 && d.length <= 15; }
-  function waNumber(p) {
-    var d = String(p || '').replace(/\D/g, '');
-    if (d.charAt(0) === '0' && d.length === 11) { return '234' + d.slice(1); }
-    return d;
-  }
-  function phoneLinks(p) {
-    if (!p) { return 'Not recorded'; }
-    return esc(p) + '<br><a href="tel:' + esc(cleanPhone(p)) + '">Call</a> \u00B7 <a href="https://wa.me/' + esc(waNumber(p)) + '" target="_blank" rel="noopener">WhatsApp</a>';
+  function merge(a, b) { for (var k in b) { if (Object.prototype.hasOwnProperty.call(b, k)) { a[k] = b[k]; } } return a; }
+  function jwtSub(t) {
+    try {
+      var p = String(t).split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+      while (p.length % 4) { p += '='; }
+      return JSON.parse(atob(p)).sub || '';
+    } catch (e) { return ''; }
   }
 
+  /* ---------- Storage (falls back to memory if the browser blocks it) ---------- */
+  var memStore = {};
+  function lsGet(k) { try { var v = localStorage.getItem(k); return v === null ? (memStore[k] || null) : v; } catch (e) { return memStore[k] || null; } }
+  function lsSet(k, v) { memStore[k] = v; try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { delete memStore[k]; try { localStorage.removeItem(k); } catch (e) {} }
+
+  /* ---------- Lists ---------- */
   var STATUSES = ['Open', 'Under Veterinary Review', 'Resolved'];
-  function badge(s) {
-    var c = s === 'Open' ? 'b-open' : (s === 'Resolved' ? 'b-ok' : 'b-rev');
-    return '<span class="badge ' + c + '">' + esc(s) + '</span>';
-  }
-  function sampleTag(x) { return x && x.sample ? '<span class="sample">Sample</span>' : ''; }
-  function etag(id) { return '<span class="etag">' + esc(id) + '</span>'; }
-  function ageText(a) { return a.ageValue + ' ' + (Number(a.ageValue) === 1 ? a.ageUnit.replace(/s$/, '') : a.ageUnit); }
-  function durText(c) { return c.durValue + ' ' + (Number(c.durValue) === 1 ? c.durUnit.replace(/s$/, '') : c.durUnit); }
-  function tempText(c) { return c.temp != null ? Number(c.temp).toFixed(1) + ' \u00B0C' : 'Not measured'; }
-
   var BREEDS = {
     Cattle: ['White Fulani', 'Red Bororo', 'Sokoto Gudali', 'Adamawa Gudali', 'Muturu', 'Keteku', 'Ndama', 'Mixed', 'Unknown'],
     Goat: ['Red Sokoto', 'West African Dwarf', 'Sahel', 'Kano Brown', 'Mixed', 'Unknown'],
@@ -373,279 +427,6 @@ a.btn.alt{color:var(--green)}
   var DIG = ['Diarrhoea', 'Constipation', 'Bloating', 'Drooling', 'Not chewing cud', 'None observed'];
   var LES = ['Skin lumps or nodules', 'Wounds', 'Mouth sores', 'Foot or hoof sores', 'Swelling', 'None observed'];
 
-  /* ---------- Sample data (clearly flagged sample:true) ---------- */
-  function makeSample() {
-    function an(id, sp, br, av, au, sx, loc) { return { id: id, species: sp, breed: br, ageValue: av, ageUnit: au, sex: sx, location: loc, ownerName: 'Sample owner', ownerPhone: '', sample: true, created: daysAgo(30) }; }
-    function cs(n, aid, sp, dv, du, app, temp, resp, dig, les, aff, dead, notes, status, ago, hist) {
-      return { ref: 'C-' + pad(n, 4), animalId: aid, species: sp, durValue: dv, durUnit: du, appetite: app, temp: temp,
-        resp: resp, dig: dig, les: les, lesDesc: '', vetName: '', vetPhone: '', affected: aff, deaths: dead, notes: notes, status: status,
-        created: daysAgo(ago), history: hist, sample: true };
-    }
-    return {
-      nextCase: 6,
-      animals: [
-        an('KD-C-001', 'Cattle', 'White Fulani', 4, 'years', 'Female', 'Birnin Gwari, Kaduna State'),
-        an('KD-C-002', 'Cattle', 'Sokoto Gudali', 6, 'years', 'Male', 'Birnin Gwari, Kaduna State'),
-        an('KD-G-010', 'Goat', 'Red Sokoto', 18, 'months', 'Female', 'Zaria, Kaduna State'),
-        an('KD-G-011', 'Goat', 'West African Dwarf', 10, 'months', 'Male', 'Zaria, Kaduna State'),
-        an('KN-S-005', 'Sheep', 'Yankasa', 2, 'years', 'Female', 'Dawakin Tofa, Kano State'),
-        an('KN-S-006', 'Sheep', 'Uda', 3, 'years', 'Male', 'Dawakin Tofa, Kano State')
-      ],
-      cases: [
-        cs(1, 'KD-C-001', 'Cattle', 5, 'days', 'Reduced', 40.1, ['Coughing', 'Nasal discharge'], ['None observed'], ['None observed'], 3, 0,
-          'Sample record. Herd was moved to a new grazing area last week.', 'Open', 6, [{ status: 'Open', at: daysAgo(6) }]),
-        cs(2, 'KD-G-010', 'Goat', 2, 'days', 'Not eating', 40.4, ['Fast or laboured breathing'], ['Diarrhoea'], ['Mouth sores'], 6, 1,
-          'Sample record. One kid died overnight.', 'Under Veterinary Review', 3,
-          [{ status: 'Open', at: daysAgo(3) }, { status: 'Under Veterinary Review', at: daysAgo(2) }]),
-        cs(3, 'KN-S-005', 'Sheep', 1, 'weeks', 'Reduced', 39.2, ['None observed'], ['Bloating'], ['None observed'], 1, 0,
-          'Sample record. Fed new forage before signs started.', 'Resolved', 14,
-          [{ status: 'Open', at: daysAgo(14) }, { status: 'Under Veterinary Review', at: daysAgo(13) }, { status: 'Resolved', at: daysAgo(9) }]),
-        cs(4, 'KD-C-002', 'Cattle', 3, 'days', 'Normal', 38.9, ['None observed'], ['None observed'], ['Skin lumps or nodules'], 1, 0,
-          'Sample record. Lumps noticed on the neck and flank.', 'Open', 2, [{ status: 'Open', at: daysAgo(2) }]),
-        cs(5, 'KD-G-011', 'Goat', 4, 'days', 'Reduced', null, ['None observed'], ['Diarrhoea'], ['None observed'], 2, 0,
-          'Sample record. Temperature was not measured.', 'Resolved', 10,
-          [{ status: 'Open', at: daysAgo(10) }, { status: 'Resolved', at: daysAgo(7) }])
-      ]
-    };
-  }
-
-  var state = readStore();
-  if (!state) { state = makeSample(); save(); }
-  if (!storageOK) { $('store-warn').hidden = false; }
-
-  function getAnimal(id) {
-    id = normId(id);
-    for (var i = 0; i < state.animals.length; i++) { if (state.animals[i].id === id) { return state.animals[i]; } }
-    return null;
-  }
-  function getCase(ref) {
-    for (var i = 0; i < state.cases.length; i++) { if (state.cases[i].ref === ref) { return state.cases[i]; } }
-    return null;
-  }
-  function sortedCases() {
-    return state.cases.slice().sort(function (a, b) { return new Date(b.created) - new Date(a.created); });
-  }
-
-  /* ---------- Toast ---------- */
-  var toastTimer = null;
-  function toast(msg) {
-    var t = $('toast');
-    t.textContent = msg; t.hidden = false;
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.hidden = true; }, 2800);
-  }
-
-  /* ---------- Shared renderers ---------- */
-  function caseCard(c) {
-    var meta = c.species + ' \u00B7 ' + fmtDate(c.created) + '<br>Affected: ' + c.affected + ' \u00B7 Deaths: ' + c.deaths;
-    return '<a class="casecard" href="#cases/' + encodeURIComponent(c.ref) + '">' +
-      '<div class="cc-top"><span class="cc-ref">' + esc(c.ref) + sampleTag(c) + '</span>' + badge(c.status) + '</div>' +
-      etag(c.animalId) + '<div class="cc-meta">' + meta + '</div></a>';
-  }
-  function emptyBox(msg, linkHref, linkText) {
-    return '<div class="empty">' + esc(msg) + (linkHref ? '<br><br><a class="btn sm" href="' + linkHref + '">' + esc(linkText) + '</a>' : '') + '</div>';
-  }
-  function kv(label, value) { return '<div><dt>' + esc(label) + '</dt><dd>' + value + '</dd></div>'; }
-
-  /* ---------- 1. Dashboard ---------- */
-  function renderDashboard() {
-    var sampleAnimals = 0, sampleCases = 0, open = 0, openS = 0, res = 0, resS = 0, rev = 0, i, c;
-    for (i = 0; i < state.animals.length; i++) { if (state.animals[i].sample) { sampleAnimals++; } }
-    for (i = 0; i < state.cases.length; i++) {
-      c = state.cases[i];
-      if (c.sample) { sampleCases++; }
-      if (c.status === 'Open') { open++; if (c.sample) { openS++; } }
-      else if (c.status === 'Resolved') { res++; if (c.sample) { resS++; } }
-      else { rev++; }
-    }
-    function sub(n) { return n > 0 ? '<div class="s">includes ' + n + ' sample</div>' : '<div class="s">&nbsp;</div>'; }
-    $('tiles').innerHTML =
-      '<a class="tile t-green" href="#records"><div class="n">' + state.animals.length + '</div><div class="l">Registered animals</div>' + sub(sampleAnimals) + '</a>' +
-      '<a class="tile" href="#cases" data-filter="All"><div class="n">' + state.cases.length + '</div><div class="l">Reported cases</div>' + sub(sampleCases) + '</a>' +
-      '<a class="tile t-open" href="#cases" data-filter="Open"><div class="n">' + open + '</div><div class="l">Open cases</div>' + sub(openS) + '</a>' +
-      '<a class="tile t-ok" href="#cases" data-filter="Resolved"><div class="n">' + res + '</div><div class="l">Resolved cases</div>' + sub(resS) + '</a>';
-    $('review-line').textContent = rev + ' case' + (rev === 1 ? '' : 's') + ' under veterinary review (counted in reported cases).';
-
-    function roleOpt(v) { return '<label><input type="radio" name="role" value="' + v + '"' + ((state.role || 'Farmer') === v ? ' checked' : '') + '><span>' + v + '</span></label>'; }
-    $('role-card').innerHTML = '<h3>Using the app as</h3><div class="seg">' + roleOpt('Farmer') + roleOpt('Veterinary surgeon') + '</div>' +
-      '<div class="hint" style="margin-top:8px">Veterinary view adds decision support and an assessment form to each case. This only changes what is shown on this phone. It is not a login.</div>';
-    var info = $('sample-info');
-    if (sampleAnimals + sampleCases > 0) {
-      info.hidden = false;
-      info.innerHTML = '<b>Sample data</b><br>Records marked "Sample" were added so you can try the app. They are not real animals or cases and they are included in the numbers below.' +
-        '<div style="margin-top:12px"><button type="button" class="btn alt sm" id="btn-rm-sample" style="margin:0">Remove sample data</button></div>';
-    } else { info.hidden = true; info.innerHTML = ''; }
-
-    var recent = sortedCases().slice(0, 3), html = '';
-    for (i = 0; i < recent.length; i++) { html += caseCard(recent[i]); }
-    $('dash-recent').innerHTML = html || emptyBox('No cases reported yet.', '#report', 'Report a case');
-    if (recent.length) { $('dash-recent').innerHTML += '<a class="btn alt sm" href="#cases">See all cases</a>'; }
-  }
-
-  /* ---------- 2. Registration ---------- */
-  function fillAnimalList() {
-    var html = '';
-    for (var i = 0; i < state.animals.length; i++) { html += '<option value="' + esc(state.animals[i].id) + '">'; }
-    $('animal-list').innerHTML = html;
-  }
-  function fillBreeds() {
-    var sp = $('a-species').value, list = sp ? BREEDS[sp] : [], html = '';
-    for (var i = 0; i < list.length; i++) { html += '<option value="' + esc(list[i]) + '">'; }
-    $('breed-list').innerHTML = html;
-  }
-  function animalCard(a) {
-    var n = 0;
-    for (var i = 0; i < state.cases.length; i++) { if (state.cases[i].animalId === a.id) { n++; } }
-    return '<div class="card">' + etag(a.id) + sampleTag(a) +
-      '<div style="margin-top:6px;font-weight:600">' + esc(a.species) + ' \u00B7 ' + esc(a.breed) + '</div>' +
-      '<div class="cc-meta">' + esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + '<br>' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded') + (a.ownerPhone ? ' \u00B7 ' + esc(a.ownerPhone) : '') + '<br>' + n + ' case' + (n === 1 ? '' : 's') + ' on record</div></div>';
-  }
-  function renderRecentAnimals() {
-    var html = '', n = Math.min(state.animals.length, 5);
-    for (var i = 0; i < n; i++) { html += animalCard(state.animals[i]); }
-    $('recent-animals').innerHTML = html || emptyBox('No animals registered yet.');
-  }
-
-  /* ---------- Form helpers ---------- */
-  function clearErrs(form) {
-    var els = form.querySelectorAll('.err');
-    for (var i = 0; i < els.length; i++) { els[i].hidden = true; els[i].textContent = ''; }
-  }
-  function Validator(form) { this.form = form; this.first = null; this.count = 0; }
-  Validator.prototype.fail = function (key, msg) {
-    var el = $('e-' + key);
-    el.textContent = msg; el.hidden = false;
-    if (!this.first) { this.first = el; }
-    this.count++;
-  };
-  Validator.prototype.done = function () {
-    if (this.first && this.first.scrollIntoView) { this.first.scrollIntoView(); }
-    return this.count === 0;
-  };
-  function radioVal(name) {
-    var el = document.querySelector('input[name="' + name + '"]:checked');
-    return el ? el.value : '';
-  }
-  function checkedVals(containerId) {
-    var els = $(containerId).querySelectorAll('input:checked'), out = [];
-    for (var i = 0; i < els.length; i++) { out.push(els[i].value); }
-    return out;
-  }
-  function buildChecks(containerId, name, options) {
-    var html = '';
-    for (var i = 0; i < options.length; i++) {
-      var none = options[i] === 'None observed' ? ' data-none="1"' : '';
-      html += '<label><input type="checkbox" name="' + name + '" value="' + esc(options[i]) + '"' + none + '><span>' + esc(options[i]) + '</span></label>';
-    }
-    var box = $(containerId);
-    box.innerHTML = html;
-    box.addEventListener('change', function (e) {
-      var t = e.target, all = box.querySelectorAll('input');
-      if (t.type !== 'checkbox' || !t.checked) { return; }
-      for (var i = 0; i < all.length; i++) {
-        if (all[i] === t) { continue; }
-        if (t.getAttribute('data-none')) { all[i].checked = false; }
-        else if (all[i].getAttribute('data-none')) { all[i].checked = false; }
-      }
-    });
-  }
-
-  $('a-species').addEventListener('change', fillBreeds);
-  $('form-register').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var f = this, v = new Validator(f);
-    clearErrs(f);
-    var id = normId($('a-id').value), sp = $('a-species').value, breed = $('a-breed').value.trim(),
-        age = parseInt($('a-age').value, 10), unit = $('a-ageunit').value, sex = radioVal('a-sex'), loc = $('a-location').value.trim(),
-        own = $('a-owner').value.trim(), ownPh = $('a-ownerphone').value.trim();
-    if (!id) { v.fail('a-id', 'Enter an animal ID.'); }
-    else if (getAnimal(id)) { v.fail('a-id', 'This ID is already registered. Use a different ID.'); }
-    if (!sp) { v.fail('a-species', 'Choose cattle, goat or sheep.'); }
-    if (!breed) { v.fail('a-breed', 'Enter a breed, or type "Unknown".'); }
-    if (isNaN(age) || age < 1) { v.fail('a-age', 'Enter the age as a whole number, 1 or more.'); }
-    else if (unit === 'years' && age > 30) { v.fail('a-age', 'Age in years looks too high. Check the number.'); }
-    if (!sex) { v.fail('a-sex', 'Choose male or female.'); }
-    if (!loc) { v.fail('a-location', 'Enter the farm location.'); }
-    if (!own) { v.fail('a-owner', 'Enter the owner name.'); }
-    if (ownPh && !phoneOK(ownPh)) { v.fail('a-ownerphone', 'Enter a phone number with 10 to 15 digits, or leave it blank.'); }
-    if (!v.done()) { return; }
-    state.animals.unshift({ id: id, species: sp, breed: breed, ageValue: age, ageUnit: unit, sex: sex, location: loc, ownerName: own, ownerPhone: ownPh, sample: false, created: nowISO() });
-    save();
-    f.reset(); fillBreeds(); fillAnimalList(); renderRecentAnimals();
-    toast('Animal ' + id + ' saved');
-  });
-
-  /* ---------- 3. Report a case ---------- */
-  function lookupAnimal() {
-    var id = normId($('r-animal').value), a = getAnimal(id), sel = $('r-species'), hint = $('r-hint');
-    if (a) {
-      sel.value = a.species; sel.disabled = true;
-      hint.textContent = 'Registered: ' + a.species + ' \u00B7 ' + a.breed + ' \u00B7 ' + a.location;
-    } else {
-      sel.disabled = false;
-      hint.textContent = id ? 'Not registered yet. The case will still be saved. You can register this animal later.' : '';
-    }
-  }
-  $('r-animal').addEventListener('input', lookupAnimal);
-  $('r-animal').addEventListener('change', lookupAnimal);
-
-  $('form-report').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var f = this, v = new Validator(f);
-    clearErrs(f);
-    var id = normId($('r-animal').value), sp = $('r-species').value, dur = parseInt($('r-dur').value, 10),
-        app = radioVal('r-app'), tRaw = $('r-temp').value.trim(), temp = tRaw === '' ? null : parseFloat(tRaw),
-        resp = checkedVals('g-resp'), dig = checkedVals('g-dig'), les = checkedVals('g-les'),
-        aff = parseInt($('r-aff').value, 10), dead = parseInt($('r-dead').value, 10),
-        vet = $('r-vet').value.trim(), vetPh = $('r-vetphone').value.trim(), oth = checkedVals('g-oth');
-    if (!id) { v.fail('r-animal', 'Enter the animal ID.'); }
-    if (!sp) { v.fail('r-species', 'Choose the species.'); }
-    if (isNaN(dur) || dur < 1) { v.fail('r-dur', 'Enter how long as a number, 1 or more.'); }
-    if (!app) { v.fail('r-app', 'Choose the appetite.'); }
-    if (temp !== null && (isNaN(temp) || temp < 30 || temp > 45)) { v.fail('r-temp', 'Enter a temperature between 30 and 45 \u00B0C, or leave it blank.'); }
-    if (!resp.length) { v.fail('r-resp', 'Select at least one, or "None observed".'); }
-    if (!dig.length) { v.fail('r-dig', 'Select at least one, or "None observed".'); }
-    if (!les.length) { v.fail('r-les', 'Select at least one, or "None observed".'); }
-    if (isNaN(aff) || aff < 1) { v.fail('r-aff', 'Number affected must be 1 or more.'); }
-    else if (isNaN(dead) || dead < 0) { v.fail('r-aff', 'Deaths must be 0 or more.'); }
-    else if (dead > aff) { v.fail('r-aff', 'Deaths cannot be more than the number affected.'); }
-    if (vetPh && !phoneOK(vetPh)) { v.fail('r-vet', 'Enter a phone number with 10 to 15 digits, or leave it blank.'); }
-    if (!v.done()) { return; }
-
-    var ref = 'C-' + pad(state.nextCase++, 4), at = nowISO();
-    state.cases.push({
-      ref: ref, animalId: id, species: sp, durValue: dur, durUnit: $('r-durunit').value, appetite: app, temp: temp,
-      resp: resp, dig: dig, les: les, lesDesc: $('r-lesdesc').value.trim(), vetName: vet, vetPhone: vetPh, oth: oth, vacc: $('r-vacc').value, contact: $('r-contact').value, affected: aff, deaths: dead,
-      notes: $('r-notes').value.trim(), status: 'Open', created: at, history: [{ status: 'Open', at: at }], sample: false
-    });
-    save();
-    f.reset(); lookupAnimal();
-    $('r-aff').value = 1; $('r-dead').value = 0;
-    toast('Case ' + ref + ' submitted');
-    location.hash = '#cases/' + encodeURIComponent(ref);
-  });
-
-  /* ---------- 4. Case management ---------- */
-  var caseFilter = 'All';
-  function renderFilters() {
-    var opts = ['All'].concat(STATUSES), html = '';
-    for (var i = 0; i < opts.length; i++) {
-      html += '<button type="button" data-filter="' + esc(opts[i]) + '" class="' + (caseFilter === opts[i] ? 'on' : '') + '">' + esc(opts[i]) + '</button>';
-    }
-    $('case-filters').innerHTML = html;
-  }
-  function renderCaseList() {
-    var q = $('case-search').value.toLowerCase().trim(), all = sortedCases(), out = '', n = 0;
-    for (var i = 0; i < all.length; i++) {
-      var c = all[i], a = getAnimal(c.animalId);
-      if (caseFilter !== 'All' && c.status !== caseFilter) { continue; }
-      var hay = [c.ref, c.animalId, c.species, c.status, c.notes, c.vetName, a ? a.breed + ' ' + a.location + ' ' + (a.ownerName || '') : ''].join(' ').toLowerCase();
-      if (q && hay.indexOf(q) === -1) { continue; }
-      out += caseCard(c); n++;
-    }
-    $('case-count').textContent = n + ' case' + (n === 1 ? '' : 's') + ' shown';
-    $('case-list').innerHTML = out || emptyBox(state.cases.length ? 'No cases match your search.' : 'No cases reported yet.', state.cases.length ? '' : '#report', 'Report a case');
-  }
   /* ---------- Veterinary decision support (rule-based, not validated) ---------- */
   var OTH = ['Lameness', 'Pale gums', 'Nervous signs', 'Abortion', 'Weight loss', 'Swollen lymph nodes', 'None observed'];
   var SIG_MAP = {
@@ -724,8 +505,6 @@ a.btn.alt{color:var(--green)}
       tests: 'Serology for brucellosis (RBT, ELISA); Rift Valley fever PCR or serology during outbreaks; fetal membranes and stomach contents for culture. Zoonotic: wear gloves.' }
   ];
 
-  function isVet() { return state.role === 'Veterinary surgeon'; }
-
   function signalsFor(c, a) {
     var s = {}, i, all = [].concat(c.resp || [], c.dig || [], c.les || [], c.oth || []);
     for (i = 0; i < all.length; i++) { if (SIG_MAP[all[i]]) { s[SIG_MAP[all[i]]] = true; } }
@@ -781,54 +560,414 @@ a.btn.alt{color:var(--green)}
     }
     return h + '</div>';
   }
-  function taField(id, label, val, hint) {
-    return '<div class="field"><label class="lbl" for="' + id + '">' + esc(label) + '</label><textarea id="' + id + '">' + esc(val || '') + '</textarea>' + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + '</div>';
+
+  /* ---------- Phone helpers ---------- */
+  function cleanPhone(p) { return String(p || '').replace(/[^\d+]/g, ''); }
+  function phoneOK(p) { var d = String(p || '').replace(/\D/g, ''); return d.length >= 10 && d.length <= 15; }
+  function waNumber(p) {
+    var d = String(p || '').replace(/\D/g, '');
+    if (d.charAt(0) === '0' && d.length === 11) { return '234' + d.slice(1); }
+    return d;
   }
-  function vetSection(c, a) {
-    var n = c.vetNotes || {}, h = '', ow = a ? a : null;
-    if (isVet()) {
-      h += dxPanel(c, a);
-      h += '<div class="card"><h3>Your assessment and plan</h3>' +
-        taField('va-dx', 'Working diagnosis or differentials', n.dx) +
-        taField('va-tests', 'Tests requested', n.tests) +
-        taField('va-plan', 'Plan and advice to the farmer', n.plan, 'Write the treatment plan and any doses yourself. This app does not suggest them.') +
-        '<button type="button" class="btn alt sm" data-save-assess="' + esc(c.ref) + '">Save assessment</button>' +
-        '<button type="button" class="btn wa sm" data-send-advice="' + esc(c.ref) + '" style="margin:0">' +
-        (ow && ow.ownerPhone ? 'Send advice to ' + esc(ow.ownerName || 'owner') + ' on WhatsApp' : 'Send advice on WhatsApp') + '</button></div>';
-    } else {
-      h += '<div class="card"><h3>Veterinary advice</h3>';
-      if (n.dx || n.tests) {
-        h += '<div class="kv">' + (n.dx ? kv('Assessment', esc(n.dx)) : '') + (n.tests ? kv('Tests requested', esc(n.tests)) : '') + '</div><div style="height:10px"></div>';
-      }
-      h += taField('va-plan', 'Advice from your veterinary surgeon', n.plan, 'When your veterinary surgeon replies on WhatsApp, paste the reply here so it stays with this case.') +
-        '<button type="button" class="btn alt sm" data-save-assess="' + esc(c.ref) + '" style="margin:0">Save advice</button>' +
-        '<div class="hint" style="margin-top:10px">Veterinary surgeon? Switch to "Veterinary surgeon" on the Home page to see decision support.</div></div>';
-    }
-    return h;
-  }
-  function saveAssess(c) {
-    var n = c.vetNotes || {};
-    if ($('va-dx')) { n.dx = $('va-dx').value.trim(); }
-    if ($('va-tests')) { n.tests = $('va-tests').value.trim(); }
-    if ($('va-plan')) { n.plan = $('va-plan').value.trim(); }
-    n.at = nowISO();
-    c.vetNotes = n;
-    save();
-  }
-  function adviceText(c) {
-    var n = c.vetNotes || {}, L = [];
-    L.push('Veterinary advice for case ' + c.ref + ' (animal ' + c.animalId + ')');
-    if (n.dx) { L.push('Assessment: ' + n.dx); }
-    if (n.tests) { L.push('Tests requested: ' + n.tests); }
-    if (n.plan) { L.push('Plan and advice: ' + n.plan); }
-    L.push('If more animals become sick or die, contact your veterinary surgeon straight away.');
-    L.push('Sent with AgriSentinel AI (early prototype).');
-    return L.join('\n');
+  function waLink(phone, text) { return 'https://wa.me/' + (phone ? waNumber(phone) : '') + '?text=' + encodeURIComponent(text); }
+  function phoneLinks(p) {
+    if (!p) { return 'Not recorded'; }
+    return esc(p) + '<br><a href="tel:' + esc(cleanPhone(p)) + '">Call</a> · <a href="https://wa.me/' + esc(waNumber(p)) + '" target="_blank" rel="noopener">WhatsApp</a>';
   }
 
+  /* ---------- Session ---------- */
+  var session = null;
+  function loadSession() {
+    var raw = lsGet(AUTH_KEY);
+    session = null;
+    if (raw) { try { session = JSON.parse(raw); } catch (e) { session = null; } }
+    if (session && !session.access_token) { session = null; }
+  }
+  function saveSession(s) {
+    session = s;
+    if (s) { lsSet(AUTH_KEY, JSON.stringify(s)); } else { lsDel(AUTH_KEY); }
+  }
+  function sessionFrom(d) {
+    return {
+      access_token: d.access_token, refresh_token: d.refresh_token,
+      expires_at: d.expires_at || (nowSec() + (d.expires_in || 3600)), user: d.user || null
+    };
+  }
+
+  /* ---------- Network ---------- */
+  function timeoutP(p, ms) {
+    return new Promise(function (res, rej) {
+      var t = setTimeout(function () { rej(new Error('timeout')); }, ms);
+      p.then(function (v) { clearTimeout(t); res(v); }, function (e) { clearTimeout(t); rej(e); });
+    });
+  }
+  function http(method, path, body, opts) {
+    opts = opts || {};
+    var headers = { 'apikey': SB_KEY, 'Content-Type': 'application/json' };
+    if (opts.token) { headers['Authorization'] = 'Bearer ' + opts.token; }
+    if (opts.prefer) { headers['Prefer'] = opts.prefer; }
+    return timeoutP(fetch(SB_URL + path, { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined }), 25000)
+      .then(function (r) {
+        return r.text().then(function (t) {
+          var d = null;
+          try { d = t ? JSON.parse(t) : null; } catch (e) { d = t; }
+          return { ok: r.ok, status: r.status, data: d };
+        });
+      })
+      .catch(function () { return { ok: false, status: 0, data: null, net: true }; });
+  }
+  var refreshing = null;
+  function refreshToken() {
+    if (refreshing) { return refreshing; }
+    refreshing = http('POST', '/auth/v1/token?grant_type=refresh_token', { refresh_token: session.refresh_token }).then(function (r) {
+      refreshing = null;
+      if (r.ok && r.data && r.data.access_token) { saveSession(sessionFrom(r.data)); return true; }
+      if (r.net) { return 'net'; }
+      return false;
+    });
+    return refreshing;
+  }
+  function ensureToken() {
+    if (!session) { return Promise.resolve(false); }
+    if (session.expires_at - nowSec() > 60) { return Promise.resolve(true); }
+    return refreshToken();
+  }
+  function rest(method, path, body, prefer) {
+    return ensureToken().then(function (ok) {
+      if (ok === 'net') { return { ok: false, status: 0, data: null, net: true }; }
+      if (ok === false) { forceSignOut('Your session has ended. Please sign in again.'); return { ok: false, status: 401, data: null, signedOut: true }; }
+      return http(method, '/rest/v1/' + path, body, { token: session.access_token, prefer: prefer }).then(function (r) {
+        if (r.status === 401) { forceSignOut('Your session has ended. Please sign in again.'); r.signedOut = true; }
+        return r;
+      });
+    });
+  }
+  function errText(r) {
+    if (!r) { return 'Something went wrong. Try again.'; }
+    if (r.net) { return 'Cannot reach the server. Check your internet connection and try again.'; }
+    var d = r.data, m = d && (d.message || d.msg || d.error_description || d.error);
+    if (r.status === 429) { return 'Too many requests. Wait a few minutes and try again.'; }
+    if (r.status === 403) { return 'You do not have permission to do that.'; }
+    if (m) { return String(m); }
+    return 'Something went wrong (code ' + r.status + '). Try again.';
+  }
+  function authErrText(r) {
+    if (r.net) { return errText(r); }
+    var d = r.data || {}, code = d.error_code || d.code || '', m = d.msg || d.message || d.error_description || '';
+    if (code === 'invalid_credentials') { return 'Wrong email or password.'; }
+    if (code === 'email_not_confirmed') { return 'Your email is not confirmed yet. Open the confirmation link we emailed you, then sign in.'; }
+    if (code === 'user_already_exists' || code === 'email_exists') { return 'This email is already registered. Use Sign in.'; }
+    if (code === 'weak_password') { return 'Choose a stronger password: at least 8 characters, with letters and numbers.'; }
+    if (code === 'over_email_send_rate_limit' || r.status === 429) { return 'Too many attempts. Wait a few minutes and try again.'; }
+    if (code === 'signup_disabled') { return 'New sign-ups are switched off for this app. Contact the administrator.'; }
+    return m ? String(m) : 'Could not complete that. Try again.';
+  }
+
+  /* ---------- App state ---------- */
+  var me = null, profile = null, profiles = {}, animals = [], cases = [];
+  var caseFilter = 'All', openRec = {}, pendingReportId = '', appReady = false, pollTimer = null;
+
+  function myName() { return (profile && profile.full_name) || (me && me.email) || 'User'; }
+  function isVerifiedVet() { return !!(profile && profile.role === 'vet' && profile.vet_verified); }
+  function isPendingVet() { return !!(profile && profile.role === 'vet' && !profile.vet_verified); }
+  function roleLabel() {
+    if (!profile) { return ''; }
+    if (profile.role === 'vet') { return profile.vet_verified ? 'Veterinary surgeon (approved)' : 'Veterinary surgeon (waiting for approval)'; }
+    return 'Farmer';
+  }
+
+  function mapAnimal(r) {
+    return { rowId: r.id, id: r.tag, species: r.species, breed: r.breed || '', ageValue: r.age_value, ageUnit: r.age_unit || 'years',
+      sex: r.sex || '', location: r.location || '', ownerName: r.owner_name || '', ownerPhone: r.owner_phone || '', created: r.created_at };
+  }
+  function snap(a) {
+    return { id: a.id, species: a.species, breed: a.breed, ageValue: a.ageValue, ageUnit: a.ageUnit, sex: a.sex,
+      location: a.location, ownerName: a.ownerName, ownerPhone: a.ownerPhone };
+  }
+  function mapCase(r) {
+    var c = merge({}, r.report || {});
+    c.rowId = r.id; c.ref = r.ref || ''; c.animalId = r.animal_tag; c.species = r.species; c.status = r.status;
+    c.created = r.created_at; c.updated = r.updated_at; c.reporterId = r.reporter_id; c.vetId = r.assigned_vet_id;
+    c.animal = r.animal || null; c.vetNotes = r.vet_notes || {}; c.history = r.history || [];
+    return c;
+  }
+  function getCase(id) { for (var i = 0; i < cases.length; i++) { if (cases[i].rowId === id) { return cases[i]; } } return null; }
+  function replaceCase(c) { for (var i = 0; i < cases.length; i++) { if (cases[i].rowId === c.rowId) { cases[i] = c; return; } } cases.unshift(c); }
+  function getOwnAnimal(tag) {
+    tag = normId(tag);
+    for (var i = 0; i < animals.length; i++) { if (animals[i].id === tag) { return animals[i]; } }
+    return null;
+  }
+  function animalOf(c) {
+    if (c.animal) { return c.animal; }
+    if (me && c.reporterId === me.id) { var o = getOwnAnimal(c.animalId); if (o) { return snap(o); } }
+    return null;
+  }
+  function sortedCases() { return cases.slice().sort(function (a, b) { return new Date(b.created) - new Date(a.created); }); }
+  function pname(id) { var p = profiles[id]; return p && p.full_name ? p.full_name : ''; }
+
+  function loadAll() {
+    return Promise.all([
+      rest('GET', 'profiles?select=*'),
+      rest('GET', 'animals?select=*&order=created_at.desc'),
+      rest('GET', 'cases?select=*&order=created_at.desc')
+    ]).then(function (rs) {
+      var i;
+      for (i = 0; i < rs.length; i++) {
+        if (rs[i].signedOut) { return { ok: false, signedOut: true }; }
+        if (!rs[i].ok || !(rs[i].data instanceof Array)) { return { ok: false, res: rs[i] }; }
+      }
+      profiles = {};
+      rs[0].data.forEach(function (p) { profiles[p.id] = p; });
+      profile = profiles[me.id] || null;
+      if (!profile) { return { ok: false, noProfile: true }; }
+      animals = rs[1].data.map(mapAnimal);
+      cases = rs[2].data.map(mapCase);
+      return { ok: true };
+    });
+  }
+
+  /* ---------- Screens ---------- */
+  function showLoading(on) { $('loading').hidden = !on; }
+  function showOnly(which) {
+    $('view-auth').hidden = which !== 'auth';
+    $('view-error').hidden = which !== 'error';
+    $('app').hidden = which !== 'app';
+    $('nav').hidden = which !== 'app';
+  }
+  function setNotice(html, kind) { $('auth-notice').innerHTML = html ? '<div class="banner ' + (kind || 'info') + '">' + html + '</div>' : ''; }
+  function setAuthMode(m) {
+    var b = $('auth-tabs').getElementsByTagName('button'), i;
+    for (i = 0; i < b.length; i++) { b[i].className = b[i].getAttribute('data-auth') === m ? 'on' : ''; }
+    $('form-signin').hidden = m !== 'in';
+    $('form-signup').hidden = m !== 'up';
+    clearErrs($('form-signin')); clearErrs($('form-signup'));
+  }
+  function showAuth(noticeHtml, kind, mode) {
+    appReady = false; stopPoll(); showLoading(false);
+    setNotice(noticeHtml, kind);
+    setAuthMode(mode || 'in');
+    showOnly('auth');
+    window.scrollTo(0, 0);
+  }
+  function showError(msg) { appReady = false; showLoading(false); $('err-text').textContent = msg; showOnly('error'); }
+  function resetUi() {
+    /* Nothing from the previous person may stay on screen or in the forms. */
+    caseFilter = 'All'; openRec = {}; pendingReportId = '';
+    var ids = ['acct-card', 'tiles', 'review-line', 'vet-wait', 'import-card', 'dash-recent', 'recent-animals', 'case-list', 'case-detail', 'rec-list', 'case-count', 'case-filters'], i;
+    for (i = 0; i < ids.length; i++) { $(ids[i]).innerHTML = ''; }
+    $('review-line').textContent = '';
+    $('case-search').value = ''; $('rec-search').value = '';
+    $('form-register').reset(); $('form-report').reset(); $('form-signin').reset(); $('form-signup').reset();
+    $('su-vcn-wrap').hidden = true; $('r-species').disabled = false; $('r-hint').textContent = '';
+    $('si-pass').type = 'password'; $('su-pass').type = 'password';
+    $('cases-list-wrap').hidden = false; $('case-detail').hidden = true;
+  }
+  function forceSignOut(msg) {
+    saveSession(null); me = null; profile = null; profiles = {}; animals = []; cases = [];
+    resetUi();
+    showAuth(msg ? esc(msg) : '', 'warn', 'in');
+  }
+  function startApp() {
+    me = { id: (session.user && session.user.id) || jwtSub(session.access_token), email: (session.user && session.user.email) || '' };
+    showLoading(true);
+    loadAll().then(function (r) {
+      showLoading(false);
+      if (r.signedOut) { return; }
+      if (!r.ok) {
+        showError(r.noProfile ? 'Your profile could not be found. Sign out and sign in again.' : errText(r.res));
+        return;
+      }
+      appReady = true; showOnly('app'); route(); startPoll();
+    });
+  }
+  function afterAuth() {
+    location.hash = '#dashboard';
+    startApp();
+  }
+
+  /* ---------- Auto refresh ---------- */
+  function stopPoll() { if (pollTimer) { clearInterval(pollTimer); pollTimer = null; } }
+  function startPoll() {
+    stopPoll();
+    pollTimer = setInterval(function () { if (!document.hidden && appReady) { softRefresh(); } }, 60000);
+  }
+  function softRefresh() {
+    return loadAll().then(function (r) { if (r.ok && appReady) { rerenderLists(); } return r; });
+  }
+  function rerenderLists() {
+    var v = currentView();
+    if (v.name === 'dashboard') { renderDashboard(); }
+    else if (v.name === 'cases' && !v.arg) { renderCaseList(); }
+    else if (v.name === 'records') { renderRecords(); }
+  }
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && appReady) { softRefresh(); } });
+  window.addEventListener('online', function () { $('net-warn').hidden = true; });
+  window.addEventListener('offline', function () { $('net-warn').hidden = false; });
+
+  /* ---------- Shared UI pieces ---------- */
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('toast');
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+  function badge(s) {
+    var c = s === 'Open' ? 'b-open' : (s === 'Resolved' ? 'b-ok' : 'b-rev');
+    return '<span class="badge ' + c + '">' + esc(s) + '</span>';
+  }
+  function etag(id) { return '<span class="etag">' + esc(id) + '</span>'; }
+  function ageText(a) { return a.ageValue + ' ' + (Number(a.ageValue) === 1 ? String(a.ageUnit).replace(/s$/, '') : a.ageUnit); }
+  function durText(c) { return c.durValue + ' ' + (Number(c.durValue) === 1 ? String(c.durUnit).replace(/s$/, '') : c.durUnit); }
+  function tempText(c) { return c.temp != null ? Number(c.temp).toFixed(1) + ' °C' : 'Not measured'; }
+  function kv(label, value) { return '<div><dt>' + esc(label) + '</dt><dd>' + value + '</dd></div>'; }
+  function emptyBox(msg, linkHref, linkText) {
+    return '<div class="empty">' + esc(msg) + (linkHref ? '<br><br><a class="btn sm" href="' + linkHref + '">' + esc(linkText) + '</a>' : '') + '</div>';
+  }
+  function setBusy(btn, on, text) {
+    if (!btn) { return; }
+    if (on) { btn.setAttribute('data-label', btn.textContent); btn.textContent = text || 'Please wait…'; btn.disabled = true; }
+    else { btn.textContent = btn.getAttribute('data-label') || btn.textContent; btn.disabled = false; }
+  }
+  function clearErrs(form) {
+    var els = form.querySelectorAll('.err');
+    for (var i = 0; i < els.length; i++) { els[i].hidden = true; els[i].textContent = ''; }
+  }
+  function Validator() { this.first = null; this.count = 0; }
+  Validator.prototype.fail = function (key, msg) {
+    var el = $('e-' + key);
+    el.textContent = msg; el.hidden = false;
+    if (!this.first) { this.first = el; }
+    this.count++;
+  };
+  Validator.prototype.done = function () {
+    if (this.first && this.first.scrollIntoView) { this.first.scrollIntoView(); }
+    return this.count === 0;
+  };
+  function radioVal(name) { var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
+  function checkedVals(id) {
+    var els = $(id).querySelectorAll('input:checked'), out = [];
+    for (var i = 0; i < els.length; i++) { out.push(els[i].value); }
+    return out;
+  }
+  function buildChecks(id, name, options) {
+    var html = '';
+    for (var i = 0; i < options.length; i++) {
+      var none = options[i] === 'None observed' ? ' data-none="1"' : '';
+      html += '<label><input type="checkbox" name="' + name + '" value="' + esc(options[i]) + '"' + none + '><span>' + esc(options[i]) + '</span></label>';
+    }
+    var box = $(id);
+    box.innerHTML = html;
+    box.addEventListener('change', function (e) {
+      var t = e.target, all = box.querySelectorAll('input'), j;
+      if (t.type !== 'checkbox' || !t.checked) { return; }
+      for (j = 0; j < all.length; j++) {
+        if (all[j] === t) { continue; }
+        if (t.getAttribute('data-none')) { all[j].checked = false; }
+        else if (all[j].getAttribute('data-none')) { all[j].checked = false; }
+      }
+    });
+  }
+
+  /* ---------- Sign in / create account ---------- */
+  $('si-show').addEventListener('change', function () { $('si-pass').type = this.checked ? 'text' : 'password'; });
+  $('su-show').addEventListener('change', function () { $('su-pass').type = this.checked ? 'text' : 'password'; });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'su-role') { $('su-vcn-wrap').hidden = e.target.value !== 'vet'; }
+  });
+
+  $('form-signin').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(), btn = f.querySelector('button[type=submit]');
+    clearErrs(f);
+    var email = $('si-email').value.trim().toLowerCase(), pass = $('si-pass').value;
+    if (!email) { v.fail('si-email', 'Enter your email.'); }
+    if (!pass) { v.fail('si-pass', 'Enter your password.'); }
+    if (!v.done()) { return; }
+    setBusy(btn, true, 'Signing in…');
+    http('POST', '/auth/v1/token?grant_type=password', { email: email, password: pass }).then(function (r) {
+      setBusy(btn, false);
+      if (r.ok && r.data && r.data.access_token) {
+        saveSession(sessionFrom(r.data)); f.reset(); setNotice('');
+        afterAuth();
+      } else { v.fail('form-signin', authErrText(r)); v.done(); }
+    });
+  });
+
+  $('form-signup').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(), btn = f.querySelector('button[type=submit]');
+    clearErrs(f);
+    var name = $('su-name').value.trim(), phone = $('su-phone').value.trim(), email = $('su-email').value.trim().toLowerCase(),
+        pass = $('su-pass').value, role = radioVal('su-role') || 'farmer', vcn = $('su-vcn').value.trim();
+    if (name.length < 2) { v.fail('su-name', 'Enter your full name.'); }
+    if (!phoneOK(phone)) { v.fail('su-phone', 'Enter a phone number with 10 to 15 digits.'); }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { v.fail('su-email', 'Enter a valid email address.'); }
+    if (pass.length < 8) { v.fail('su-pass', 'Use at least 8 characters.'); }
+    if (role === 'vet' && vcn.length < 3) { v.fail('su-vcn', 'Enter your VCN registration number.'); }
+    if (!v.done()) { return; }
+    setBusy(btn, true, 'Creating account…');
+    var redirect = encodeURIComponent(location.origin + location.pathname);
+    http('POST', '/auth/v1/signup?redirect_to=' + redirect, { email: email, password: pass, data: { full_name: name, phone: phone, role: role, vcn: role === 'vet' ? vcn : '' } }).then(function (r) {
+      setBusy(btn, false);
+      if (!r.ok) { v.fail('form-signup', authErrText(r)); v.done(); return; }
+      var d = r.data || {};
+      if (d.access_token) { saveSession(sessionFrom(d)); f.reset(); $('su-vcn-wrap').hidden = true; setNotice(''); afterAuth(); return; }
+      if (d.identities && d.identities.length === 0) { v.fail('form-signup', 'This email is already registered. Use Sign in.'); v.done(); return; }
+      f.reset(); $('su-vcn-wrap').hidden = true;
+      $('si-email').value = email;
+      showAuth('Account created. We sent a confirmation link to <b>' + esc(email) + '</b>. Open it, then sign in here. Check your spam folder if you do not see it.', 'info', 'in');
+    });
+  });
+
+  function consumeAuthHash() {
+    var h = location.hash || '';
+    if (h.indexOf('access_token=') === -1 && h.indexOf('error=') === -1) { return Promise.resolve(); }
+    var p = {}, parts = h.replace(/^#/, '').split('&'), i, kvp;
+    for (i = 0; i < parts.length; i++) {
+      kvp = parts[i].split('=');
+      if (kvp[0]) { try { p[kvp[0]] = decodeURIComponent((kvp[1] || '').replace(/\+/g, ' ')); } catch (e) { p[kvp[0]] = kvp[1] || ''; } }
+    }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
+    if (p.error && !p.access_token) {
+      pendingNotice = { html: esc(p.error_description || 'The link did not work. Please sign in or request a new link.'), kind: 'warn' };
+      return Promise.resolve();
+    }
+    if (p.access_token) {
+      saveSession({ access_token: p.access_token, refresh_token: p.refresh_token || '', expires_at: parseInt(p.expires_at, 10) || (nowSec() + (parseInt(p.expires_in, 10) || 3600)), user: null });
+      return http('GET', '/auth/v1/user', null, { token: p.access_token }).then(function (r) {
+        if (r.ok && r.data && r.data.id) { session.user = r.data; saveSession(session); }
+      });
+    }
+    return Promise.resolve();
+  }
+  var pendingNotice = null;
+
+  function signOut() {
+    var tok = session && session.access_token;
+    if (tok) { http('POST', '/auth/v1/logout', null, { token: tok }); }
+    forceSignOut('');
+    location.hash = '#dashboard';
+  }
+
+  /* ---------- Cases: shared pieces ---------- */
+  function caseCard(c) {
+    var rp = profiles[c.reporterId], line = esc(c.species) + ' · ' + esc(fmtDate(c.created)) + '<br>Affected: ' + c.affected + ' · Deaths: ' + c.deaths;
+    if (c.reporterId !== me.id && rp && rp.full_name) { line += '<br>Reported by ' + esc(rp.full_name); }
+    line += '<br>' + (c.vetId ? 'Veterinary surgeon: ' + esc(pname(c.vetId) || 'assigned') : 'Waiting for a veterinary surgeon');
+    return '<a class="casecard" href="#cases/' + encodeURIComponent(c.rowId) + '">' +
+      '<div class="cc-top"><span class="cc-ref">' + esc(c.ref) + '</span>' + badge(c.status) + '</div>' +
+      etag(c.animalId) + '<div class="cc-meta">' + line + '</div></a>';
+  }
+  function matchFilter(c) {
+    if (caseFilter === 'All') { return true; }
+    if (caseFilter === 'Unassigned') { return !c.vetId; }
+    return c.status === caseFilter;
+  }
   function caseSummary(c, a) {
-    var L = [];
-    L.push((c.sample ? '[SAMPLE] ' : '') + 'Livestock case ' + c.ref + ' (' + c.status + ')');
+    var L = [], rp = profiles[c.reporterId];
+    L.push('Livestock case ' + c.ref + ' (' + c.status + ')');
     L.push('Animal: ' + c.animalId + ' - ' + c.species + (a ? ', ' + a.breed + ', ' + a.sex + ', ' + ageText(a) : ''));
     if (a) {
       L.push('Location: ' + a.location);
@@ -845,29 +984,274 @@ a.btn.alt{color:var(--green)}
     if (c.contact && c.contact !== 'Unknown') { L.push('New animals or herd contact in last 3 weeks: ' + c.contact); }
     L.push('Animals affected: ' + c.affected + ', deaths: ' + c.deaths);
     if (c.notes) { L.push('Notes: ' + c.notes); }
+    if (rp && rp.full_name) { L.push('Reported by: ' + rp.full_name + (rp.phone ? ' (' + rp.phone + ')' : '')); }
     L.push('Reported: ' + fmtDate(c.created));
     L.push('Recorded with AgriSentinel AI (early prototype). This is not a diagnosis.');
     return L.join('\n');
   }
-  function renderCaseDetail(ref) {
-    var c = getCase(ref), box = $('case-detail');
+  function adviceText(c, n) {
+    var L = [];
+    L.push('Veterinary advice for case ' + c.ref + ' (animal ' + c.animalId + ')');
+    if (n.dx) { L.push('Assessment: ' + n.dx); }
+    if (n.tests) { L.push('Tests requested: ' + n.tests); }
+    if (n.plan) { L.push('Plan and advice: ' + n.plan); }
+    L.push('From: ' + myName());
+    L.push('If more animals become sick or die, contact your veterinary surgeon straight away.');
+    L.push('Sent with AgriSentinel AI (early prototype).');
+    return L.join('\n');
+  }
+  function taField(id, label, val, hint) {
+    return '<div class="field"><label class="lbl" for="' + id + '">' + esc(label) + '</label><textarea id="' + id + '">' + esc(val || '') + '</textarea>' + (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + '</div>';
+  }
+  function patchCase(c, fields) {
+    return rest('PATCH', 'cases?id=eq.' + encodeURIComponent(c.rowId), fields, 'return=representation').then(function (r) {
+      if (r.ok && r.data instanceof Array && r.data.length) { replaceCase(mapCase(r.data[0])); r.saved = true; }
+      else if (r.ok) { r.ok = false; r.empty = true; }
+      return r;
+    });
+  }
+  function historyAdd(c, status, note) {
+    return (c.history || []).concat([{ status: status, at: nowISO(), by: myName(), note: note || '' }]);
+  }
+
+  /* ---------- 1. Dashboard ---------- */
+  function localData() {
+    var raw = lsGet(LOCAL_KEY), s;
+    if (!raw) { return null; }
+    try { s = JSON.parse(raw); } catch (e) { return null; }
+    var an = (s.animals || []).filter(function (a) { return !a.sample; });
+    var cs = (s.cases || []).filter(function (c) { return !c.sample; });
+    return an.length || cs.length ? { animals: an, cases: cs } : null;
+  }
+  function renderDashboard() {
+    var open = 0, res = 0, rev = 0, wait = 0, i, c;
+    for (i = 0; i < cases.length; i++) {
+      c = cases[i];
+      if (c.status === 'Open') { open++; } else if (c.status === 'Resolved') { res++; } else { rev++; }
+      if (!c.vetId) { wait++; }
+    }
+    var acct = '<h3>Your account</h3><div style="font-weight:700;font-size:18px">' + esc(myName()) + '</div>' +
+      '<div class="cc-meta">' + esc(me.email) + (profile.phone ? '<br>' + esc(profile.phone) : '') + '</div>' +
+      '<div style="margin:8px 0 12px"><span class="rolebadge">' + esc(roleLabel()) + '</span></div>';
+    if (isPendingVet()) {
+      acct += '<div class="banner warn">Your veterinary account is waiting for approval. Until then you use the app as a farmer. Contact ' + esc(BUILDER) + ' on ' + esc(FEEDBACK_PHONE) + ' to be approved.</div>';
+    }
+    acct += '<div class="two"><button type="button" class="btn alt sm" id="btn-refresh" style="margin:0">Refresh</button><button type="button" class="btn alt sm" id="btn-signout" style="margin:0">Sign out</button></div>';
+    $('acct-card').innerHTML = acct;
+
+    $('vet-wait').innerHTML = isVerifiedVet() && wait > 0
+      ? '<a class="btn" href="#cases" data-filter="Unassigned">' + wait + ' case' + (wait === 1 ? '' : 's') + ' waiting for a veterinary surgeon</a>' : '';
+
+    $('tiles').innerHTML =
+      '<a class="tile t-green" href="#records"><div class="n">' + animals.length + '</div><div class="l">Registered animals</div><div class="s">registered by you</div></a>' +
+      '<a class="tile" href="#cases" data-filter="All"><div class="n">' + cases.length + '</div><div class="l">Reported cases</div><div class="s">' + (isVerifiedVet() ? 'visible to you' : 'reported by you') + '</div></a>' +
+      '<a class="tile t-open" href="#cases" data-filter="Open"><div class="n">' + open + '</div><div class="l">Open cases</div><div class="s">&nbsp;</div></a>' +
+      '<a class="tile t-ok" href="#cases" data-filter="Resolved"><div class="n">' + res + '</div><div class="l">Resolved cases</div><div class="s">&nbsp;</div></a>';
+    $('review-line').textContent = rev + ' case' + (rev === 1 ? '' : 's') + ' under veterinary review (counted in reported cases).';
+
+    var ld = localData();
+    if (ld && lsGet(IMPORT_KEY) !== me.id) {
+      $('import-card').innerHTML = '<div class="card"><h3>Records saved on this phone</h3>' +
+        '<p style="margin:0 0 12px">Found ' + ld.animals.length + ' animal' + (ld.animals.length === 1 ? '' : 's') + ' and ' + ld.cases.length + ' case' + (ld.cases.length === 1 ? '' : 's') + ' from the earlier version of this app. Add them to your account? Sample records are not included.</p>' +
+        '<button type="button" class="btn sm" id="btn-import">Add them to my account</button>' +
+        '<button type="button" class="btn alt sm" id="btn-import-skip" style="margin:0">No thanks</button></div>';
+    } else { $('import-card').innerHTML = ''; }
+
+    var recent = sortedCases().slice(0, 3), html = '';
+    for (i = 0; i < recent.length; i++) { html += caseCard(recent[i]); }
+    $('dash-recent').innerHTML = html || emptyBox('No cases yet.', '#report', 'Report a case');
+    if (recent.length) { $('dash-recent').innerHTML += '<a class="btn alt sm" href="#cases">See all cases</a>'; }
+  }
+  function importLocal(btn) {
+    var ld = localData();
+    if (!ld) { return; }
+    setBusy(btn, true, 'Adding…');
+    var an = ld.animals.map(function (a) {
+      return { tag: normId(a.id), species: a.species, breed: a.breed || null, age_value: a.ageValue || null, age_unit: a.ageUnit || null,
+        sex: a.sex || null, location: a.location || null, owner_name: a.ownerName || null, owner_phone: a.ownerPhone || null };
+    });
+    var byTag = {};
+    ld.animals.forEach(function (a) { byTag[normId(a.id)] = a; });
+    var cs = ld.cases.map(function (c) {
+      var a = byTag[normId(c.animalId)];
+      return {
+        animal_tag: normId(c.animalId), species: c.species, status: c.status || 'Open',
+        animal: a ? { id: normId(a.id), species: a.species, breed: a.breed, ageValue: a.ageValue, ageUnit: a.ageUnit, sex: a.sex, location: a.location, ownerName: a.ownerName || '', ownerPhone: a.ownerPhone || '' } : null,
+        report: { durValue: c.durValue, durUnit: c.durUnit, appetite: c.appetite, temp: c.temp == null ? null : c.temp, resp: c.resp || [], dig: c.dig || [], les: c.les || [],
+          lesDesc: c.lesDesc || '', oth: c.oth || [], vacc: c.vacc || 'Unknown', contact: c.contact || 'Unknown', affected: c.affected, deaths: c.deaths, notes: c.notes || '' },
+        vet_notes: c.vetNotes && (c.vetNotes.dx || c.vetNotes.tests || c.vetNotes.plan) ? c.vetNotes : null,
+        history: (c.history || []).map(function (h) { return { status: h.status, at: h.at, by: myName() }; }),
+        created_at: c.created || nowISO()
+      };
+    });
+    var p1 = an.length ? rest('POST', 'animals?on_conflict=owner_id,tag', an, 'resolution=ignore-duplicates,return=minimal') : Promise.resolve({ ok: true });
+    p1.then(function (r1) {
+      if (!r1.ok) { return r1; }
+      return cs.length ? rest('POST', 'cases', cs, 'return=minimal') : { ok: true };
+    }).then(function (r) {
+      setBusy(btn, false);
+      if (r.signedOut) { return; }
+      if (!r.ok) { toast(errText(r)); return; }
+      lsSet(IMPORT_KEY, me.id);
+      toast('Added ' + an.length + ' animals and ' + cs.length + ' cases');
+      softRefresh();
+    });
+  }
+
+  /* ---------- 2. Registration ---------- */
+  function fillAnimalList() {
+    var html = '';
+    for (var i = 0; i < animals.length; i++) { html += '<option value="' + esc(animals[i].id) + '">'; }
+    $('animal-list').innerHTML = html;
+  }
+  function fillBreeds() {
+    var sp = $('a-species').value, list = sp ? BREEDS[sp] : [], html = '';
+    for (var i = 0; i < list.length; i++) { html += '<option value="' + esc(list[i]) + '">'; }
+    $('breed-list').innerHTML = html;
+  }
+  function prefillOwner() {
+    if (!$('a-owner').value) { $('a-owner').value = profile.full_name || ''; }
+    if (!$('a-ownerphone').value) { $('a-ownerphone').value = profile.phone || ''; }
+  }
+  function animalCard(a) {
+    var n = 0;
+    for (var i = 0; i < cases.length; i++) { if (cases[i].reporterId === me.id && cases[i].animalId === a.id) { n++; } }
+    return '<div class="card">' + etag(a.id) +
+      '<div style="margin-top:6px;font-weight:600">' + esc(a.species) + ' · ' + esc(a.breed) + '</div>' +
+      '<div class="cc-meta">' + esc(a.sex) + ' · ' + esc(ageText(a)) + '<br>' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded') + (a.ownerPhone ? ' · ' + esc(a.ownerPhone) : '') + '<br>' + n + ' case' + (n === 1 ? '' : 's') + ' on record</div></div>';
+  }
+  function renderRecentAnimals() {
+    var html = '', n = Math.min(animals.length, 5);
+    for (var i = 0; i < n; i++) { html += animalCard(animals[i]); }
+    $('recent-animals').innerHTML = html || emptyBox('No animals registered yet.');
+  }
+  $('a-species').addEventListener('change', fillBreeds);
+  $('form-register').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(), btn = f.querySelector('button[type=submit]');
+    clearErrs(f);
+    var id = normId($('a-id').value), sp = $('a-species').value, breed = $('a-breed').value.trim(),
+        age = parseInt($('a-age').value, 10), unit = $('a-ageunit').value, sex = radioVal('a-sex'), loc = $('a-location').value.trim(),
+        own = $('a-owner').value.trim(), ownPh = $('a-ownerphone').value.trim();
+    if (!id) { v.fail('a-id', 'Enter an animal ID.'); }
+    else if (getOwnAnimal(id)) { v.fail('a-id', 'You already registered this ID. Use a different ID.'); }
+    if (!sp) { v.fail('a-species', 'Choose cattle, goat or sheep.'); }
+    if (!breed) { v.fail('a-breed', 'Enter a breed, or type "Unknown".'); }
+    if (isNaN(age) || age < 1) { v.fail('a-age', 'Enter the age as a whole number, 1 or more.'); }
+    else if (unit === 'years' && age > 30) { v.fail('a-age', 'Age in years looks too high. Check the number.'); }
+    if (!sex) { v.fail('a-sex', 'Choose male or female.'); }
+    if (!loc) { v.fail('a-location', 'Enter the farm location.'); }
+    if (!own) { v.fail('a-owner', 'Enter the owner name.'); }
+    if (ownPh && !phoneOK(ownPh)) { v.fail('a-ownerphone', 'Enter a phone number with 10 to 15 digits, or leave it blank.'); }
+    if (!v.done()) { return; }
+    setBusy(btn, true, 'Saving…');
+    rest('POST', 'animals', { tag: id, species: sp, breed: breed, age_value: age, age_unit: unit, sex: sex, location: loc, owner_name: own, owner_phone: ownPh || null }, 'return=representation').then(function (r) {
+      setBusy(btn, false);
+      if (r.signedOut) { return; }
+      if (r.ok && r.data instanceof Array && r.data[0]) {
+        animals.unshift(mapAnimal(r.data[0]));
+        f.reset(); prefillOwner(); fillBreeds(); fillAnimalList(); renderRecentAnimals();
+        toast('Animal ' + id + ' saved');
+      } else if (r.status === 409) { v.fail('a-id', 'You already registered this ID. Use a different ID.'); v.done(); }
+      else { v.fail('form-register', errText(r)); v.done(); }
+    });
+  });
+
+  /* ---------- 3. Report a case ---------- */
+  function lookupAnimal() {
+    var id = normId($('r-animal').value), a = getOwnAnimal(id), sel = $('r-species'), hint = $('r-hint');
+    if (a) {
+      sel.value = a.species; sel.disabled = true;
+      hint.textContent = 'Registered: ' + a.species + ' · ' + a.breed + ' · ' + a.location;
+    } else {
+      sel.disabled = false;
+      hint.textContent = id ? 'Not registered yet. The case will still be saved. You can register this animal later.' : '';
+    }
+  }
+  $('r-animal').addEventListener('input', lookupAnimal);
+  $('r-animal').addEventListener('change', lookupAnimal);
+  $('form-report').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = this, v = new Validator(), btn = f.querySelector('button[type=submit]');
+    clearErrs(f);
+    var id = normId($('r-animal').value), sp = $('r-species').value, dur = parseInt($('r-dur').value, 10),
+        app = radioVal('r-app'), tRaw = $('r-temp').value.trim(), temp = tRaw === '' ? null : parseFloat(tRaw),
+        resp = checkedVals('g-resp'), dig = checkedVals('g-dig'), les = checkedVals('g-les'), oth = checkedVals('g-oth'),
+        aff = parseInt($('r-aff').value, 10), dead = parseInt($('r-dead').value, 10);
+    if (!id) { v.fail('r-animal', 'Enter the animal ID.'); }
+    if (!sp) { v.fail('r-species', 'Choose the species.'); }
+    if (isNaN(dur) || dur < 1) { v.fail('r-dur', 'Enter how long as a number, 1 or more.'); }
+    if (!app) { v.fail('r-app', 'Choose the appetite.'); }
+    if (temp !== null && (isNaN(temp) || temp < 30 || temp > 45)) { v.fail('r-temp', 'Enter a temperature between 30 and 45 °C, or leave it blank.'); }
+    if (!resp.length) { v.fail('r-resp', 'Select at least one, or "None observed".'); }
+    if (!dig.length) { v.fail('r-dig', 'Select at least one, or "None observed".'); }
+    if (!les.length) { v.fail('r-les', 'Select at least one, or "None observed".'); }
+    if (isNaN(aff) || aff < 1) { v.fail('r-aff', 'Number affected must be 1 or more.'); }
+    else if (isNaN(dead) || dead < 0) { v.fail('r-aff', 'Deaths must be 0 or more.'); }
+    else if (dead > aff) { v.fail('r-aff', 'Deaths cannot be more than the number affected.'); }
+    if (!v.done()) { return; }
+    var own = getOwnAnimal(id);
+    var body = {
+      animal_tag: id, species: sp, animal: own ? snap(own) : null,
+      report: { durValue: dur, durUnit: $('r-durunit').value, appetite: app, temp: temp, resp: resp, dig: dig, les: les, lesDesc: $('r-lesdesc').value.trim(),
+        oth: oth, vacc: $('r-vacc').value, contact: $('r-contact').value, affected: aff, deaths: dead, notes: $('r-notes').value.trim() },
+      history: [{ status: 'Open', at: nowISO(), by: myName(), note: '' }]
+    };
+    setBusy(btn, true, 'Submitting…');
+    rest('POST', 'cases', body, 'return=representation').then(function (r) {
+      setBusy(btn, false);
+      if (r.signedOut) { return; }
+      if (r.ok && r.data instanceof Array && r.data[0]) {
+        var c = mapCase(r.data[0]);
+        cases.unshift(c);
+        f.reset(); lookupAnimal();
+        toast('Case ' + c.ref + ' submitted');
+        location.hash = '#cases/' + encodeURIComponent(c.rowId);
+      } else { v.fail('form-report', errText(r)); v.done(); }
+    });
+  });
+
+  /* ---------- 4. Case management ---------- */
+  function renderFilters() {
+    var opts = [['All', 'All'], ['Unassigned', 'Waiting for a vet'], ['Open', 'Open'], ['Under Veterinary Review', 'Under Veterinary Review'], ['Resolved', 'Resolved']], html = '';
+    for (var i = 0; i < opts.length; i++) {
+      html += '<button type="button" data-filter="' + esc(opts[i][0]) + '" class="' + (caseFilter === opts[i][0] ? 'on' : '') + '">' + esc(opts[i][1]) + '</button>';
+    }
+    $('case-filters').innerHTML = html;
+  }
+  function renderCaseList() {
+    var q = $('case-search').value.toLowerCase().trim(), all = sortedCases(), out = '', n = 0;
+    for (var i = 0; i < all.length; i++) {
+      var c = all[i], a = animalOf(c);
+      if (!matchFilter(c)) { continue; }
+      var hay = [c.ref, c.animalId, c.species, c.status, c.notes, pname(c.reporterId), pname(c.vetId), a ? a.breed + ' ' + a.location + ' ' + (a.ownerName || '') : ''].join(' ').toLowerCase();
+      if (q && hay.indexOf(q) === -1) { continue; }
+      out += caseCard(c); n++;
+    }
+    $('case-count').textContent = n + ' case' + (n === 1 ? '' : 's') + ' shown';
+    $('case-list').innerHTML = out || emptyBox(cases.length ? 'No cases match your search.' : 'No cases yet.', cases.length ? '' : '#report', 'Report a case');
+  }
+  function renderCaseDetail(id) {
+    var c = getCase(id), box = $('case-detail');
     if (!c) {
-      box.innerHTML = '<a class="back" href="#cases">\u2039 All cases</a>' + emptyBox('This case could not be found. It may have been deleted.');
+      box.innerHTML = '<a class="back" href="#cases">‹ All cases</a>' + emptyBox('This case could not be found. It may have been deleted, or you may not have access to it.');
       return;
     }
-    var a = getAnimal(c.animalId), i, html;
-    html = '<a class="back" href="#cases">\u2039 All cases</a>' +
-      '<div class="card"><div class="cc-top"><h1 class="page" style="margin:0">' + esc(c.ref) + sampleTag(c) + '</h1>' + badge(c.status) + '</div>' +
+    var a = animalOf(c), i, h, vv = isVerifiedVet(), isRep = c.reporterId === me.id, isMine = c.vetId === me.id;
+    var rep = profiles[c.reporterId] || null, vet = c.vetId ? (profiles[c.vetId] || null) : null, n = c.vetNotes || {};
+    h = '<a class="back" href="#cases">‹ All cases</a>' +
+      '<div class="card"><div class="cc-top"><h1 class="page" style="margin:0">' + esc(c.ref) + '</h1>' + badge(c.status) + '</div>' +
       '<div style="margin:6px 0">' + etag(c.animalId) + '</div>';
-    if (c.deaths > 0) { html += '<span class="info">Deaths reported</span>'; }
-    if (c.affected > 1) { html += '<span class="info">Several animals affected</span>'; }
-    if (c.deaths > 0 || c.affected > 1) { html += '<div class="hint" style="margin-top:8px">Contact a veterinary surgeon for assessment.</div>'; }
-    html += '<dl class="kv">' +
+    if (c.deaths > 0) { h += '<span class="info">Deaths reported</span>'; }
+    if (c.affected > 1) { h += '<span class="info">Several animals affected</span>'; }
+    if (c.deaths > 0 || c.affected > 1) { h += '<div class="hint" style="margin-top:8px">Contact a veterinary surgeon for assessment.</div>'; }
+    h += '<dl class="kv">' +
       kv('Reported', esc(fmtDate(c.created))) +
-      kv('Species', esc(c.species) + (a ? ' \u00B7 ' + esc(a.breed) : '')) +
-      (a ? kv('Animal', esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + '<br>' + esc(a.location)) : kv('Animal', 'Not registered')) +
+      (!isRep ? kv('Reported by', rep ? esc(rep.full_name || 'Unknown') + (rep.phone ? '<br>' + phoneLinks(rep.phone) : '') : 'Unknown') : '') +
+      kv('Veterinary surgeon', c.vetId ? (vet ? esc(vet.full_name || 'Assigned') + (vet.phone ? '<br>' + phoneLinks(vet.phone) : '') : 'Assigned') : 'Waiting for a veterinary surgeon to take this case') +
+      kv('Species', esc(c.species) + (a ? ' · ' + esc(a.breed) : '')) +
+      (a ? kv('Animal', esc(a.sex) + ' · ' + esc(ageText(a)) + '<br>' + esc(a.location)) : kv('Animal', 'Not registered')) +
       (a ? kv('Owner', esc(a.ownerName || 'Not recorded') + (a.ownerPhone ? '<br>' + phoneLinks(a.ownerPhone) : '')) : '') +
-      kv('Veterinary surgeon', (c.vetName || c.vetPhone) ? esc(c.vetName || 'Name not recorded') + (c.vetPhone ? '<br>' + phoneLinks(c.vetPhone) : '') : 'Not assigned yet') +
       kv('Illness so far', esc(durText(c))) +
       kv('Appetite', esc(c.appetite)) +
       kv('Measured temperature', esc(tempText(c))) +
@@ -882,90 +1266,111 @@ a.btn.alt{color:var(--green)}
       kv('Additional observations', c.notes ? esc(c.notes) : 'None recorded') +
       '</dl></div>';
 
-    html += vetSection(c, a);
-    html += '<div class="card"><h3>Update status</h3>';
-    for (i = 0; i < STATUSES.length; i++) {
-      var on = c.status === STATUSES[i];
-      html += '<button type="button" class="btn' + (on ? '' : ' alt') + '" data-set-status="' + esc(STATUSES[i]) + '" data-ref="' + esc(c.ref) + '"' + (on ? ' disabled style="opacity:1"' : '') + '>' + (on ? '\u2713 ' : '') + esc(STATUSES[i]) + '</button>';
+    if (vv && !c.vetId) {
+      h += '<div class="card"><h3>New case waiting</h3><p style="margin:0 0 12px">No veterinary surgeon has taken this case yet. When you take it, the farmer sees your name and phone number and can read your advice.</p>' +
+        '<button type="button" class="btn" data-take="' + esc(c.rowId) + '" style="margin:0">Take this case</button></div>';
     }
-    html += '</div>';
-
-    html += '<div class="card"><h3>Status history</h3><ul class="hist">';
-    for (i = c.history.length - 1; i >= 0; i--) {
-      html += '<li>' + badge(c.history[i].status) + ' <span class="hint">' + esc(fmtDate(c.history[i].at)) + '</span></li>';
+    if (vv) { h += dxPanel(c, a); }
+    if (vv && isMine) {
+      var ownerPhone = a && a.ownerPhone ? a.ownerPhone : (rep && rep.phone ? rep.phone : '');
+      h += '<div class="card"><h3>Your assessment and plan</h3>' +
+        taField('va-dx', 'Working diagnosis or differentials', n.dx) +
+        taField('va-tests', 'Tests requested', n.tests) +
+        taField('va-plan', 'Plan and advice to the farmer', n.plan, 'Write the treatment plan and any doses yourself. This app does not suggest them.') +
+        '<button type="button" class="btn sm" data-save-assess="' + esc(c.rowId) + '">Save assessment</button>' +
+        '<a class="btn wa sm" data-send-advice="' + esc(c.rowId) + '" target="_blank" rel="noopener" href="' + esc(waLink(ownerPhone, adviceText(c, n))) + '" style="margin:0">Send advice on WhatsApp</a>' +
+        '<div class="hint" style="margin-top:8px">The farmer also sees your saved advice inside the app on this case.</div></div>';
+    } else if (n.dx || n.tests || n.plan) {
+      h += '<div class="card"><h3>Veterinary advice</h3><dl class="kv">' +
+        (n.dx ? kv('Assessment', esc(n.dx)) : '') + (n.tests ? kv('Tests requested', esc(n.tests)) : '') + (n.plan ? kv('Plan and advice', esc(n.plan)) : '') +
+        kv('From', esc(n.by || pname(c.vetId) || 'Veterinary surgeon') + (n.at ? ' · ' + esc(fmtDate(n.at)) : '')) + '</dl></div>';
+    } else if (isRep) {
+      h += '<div class="card"><h3>Veterinary advice</h3><p style="margin:0">' + (c.vetId ? 'Your veterinary surgeon has not written advice yet.' : 'No veterinary surgeon has taken this case yet.') + ' Advice appears here as soon as it is saved. Tap Refresh to check.</p></div>';
     }
-    html += '</ul></div>';
 
-    var msg = encodeURIComponent(caseSummary(c, a));
-    html += '<div class="card"><h3>Share this case</h3>' +
-      '<a class="btn wa" target="_blank" rel="noopener" href="https://wa.me/?text=' + msg + '">Share on WhatsApp</a>';
-    if (c.vetPhone) {
-      html += '<a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/' + esc(waNumber(c.vetPhone)) + '?text=' + msg + '">Send to ' + esc(c.vetName || 'veterinary surgeon') + '</a>';
+    if (isRep || isMine) {
+      h += '<div class="card"><h3>Update status</h3>';
+      for (i = 0; i < STATUSES.length; i++) {
+        var on = c.status === STATUSES[i];
+        h += '<button type="button" class="btn' + (on ? '' : ' alt') + '" data-set-status="' + esc(STATUSES[i]) + '" data-id="' + esc(c.rowId) + '"' + (on ? ' disabled style="opacity:1"' : '') + '>' + (on ? '✓ ' : '') + esc(STATUSES[i]) + '</button>';
+      }
+      h += '</div>';
     }
-    html += '<div class="hint">Opens WhatsApp with the case summary ready to send.</div></div>';
 
-    html += '<div class="card"><h3>Veterinary surgeon</h3>' +
-      '<div class="field"><input type="text" id="v-name" value="' + esc(c.vetName || '') + '" placeholder="Name" aria-label="Veterinary surgeon name"></div>' +
-      '<div class="field"><input type="text" id="v-phone" inputmode="tel" value="' + esc(c.vetPhone || '') + '" placeholder="Phone" aria-label="Veterinary surgeon phone"><div class="err" id="e-v-phone" hidden></div></div>' +
-      '<button type="button" class="btn alt sm" data-save-vet="' + esc(c.ref) + '" style="margin:0">Save veterinary surgeon</button></div>';
+    var msg = caseSummary(c, a), shareHref = waLink(isRep && vet && vet.phone ? vet.phone : '', msg);
+    h += '<div class="card"><h3>Share this case</h3><a class="btn wa" target="_blank" rel="noopener" href="' + esc(shareHref) + '">' +
+      (isRep && vet && vet.phone ? 'Message ' + esc(vet.full_name || 'veterinary surgeon') + ' on WhatsApp' : 'Share on WhatsApp') + '</a>' +
+      '<div class="hint">Opens WhatsApp with the case summary ready to send.</div></div>';
 
-    html += '<div class="notice"><b>Record only</b>This page does not diagnose disease or recommend treatment. A veterinary surgeon should assess the animals.</div>' +
-      '<button type="button" class="btn danger sm" data-delete-case="' + esc(c.ref) + '">Delete this case</button>';
-    box.innerHTML = html;
+    h += '<div class="card"><h3>Status history</h3><ul class="hist">';
+    for (i = (c.history || []).length - 1; i >= 0; i--) {
+      var hs = c.history[i];
+      h += '<li>' + badge(hs.status) + ' <span class="hint">' + esc(fmtDate(hs.at)) + (hs.by ? ' · ' + esc(hs.by) : '') + '</span></li>';
+    }
+    h += '</ul></div>' +
+      '<button type="button" class="btn alt sm" id="btn-refresh-case" data-id="' + esc(c.rowId) + '">Refresh this case</button>' +
+      '<div class="notice"><b>Record only</b>This page does not diagnose disease or recommend treatment. A veterinary surgeon should assess the animals.</div>';
+    if (isRep) { h += '<button type="button" class="btn danger sm" data-delete-case="' + esc(c.rowId) + '">Delete this case</button>'; }
+    box.innerHTML = h;
   }
 
   /* ---------- 5. Health records ---------- */
-  var openRec = {};
   function recordList() {
-    var list = state.animals.slice(), seen = {}, i;
-    for (i = 0; i < list.length; i++) { seen[list[i].id] = true; }
-    for (i = 0; i < state.cases.length; i++) {
-      var c = state.cases[i];
-      if (!seen[c.animalId]) { seen[c.animalId] = true; list.push({ id: c.animalId, species: c.species, unregistered: true }); }
+    var map = {}, out = [], i, k;
+    for (i = 0; i < animals.length; i++) { k = me.id + '|' + animals[i].id; map[k] = { key: k, a: animals[i], own: true }; out.push(map[k]); }
+    for (i = 0; i < cases.length; i++) {
+      k = cases[i].reporterId + '|' + cases[i].animalId;
+      if (!map[k]) {
+        map[k] = { key: k, a: cases[i].animal || { id: cases[i].animalId, species: cases[i].species }, own: cases[i].reporterId === me.id, unreg: !cases[i].animal };
+        out.push(map[k]);
+      }
     }
-    return list;
+    return out;
   }
   function renderRecords() {
-    var q = $('rec-search').value.toLowerCase().trim(), list = recordList(), out = '', shown = 0;
+    var q = $('rec-search').value.toLowerCase().trim(), list = recordList(), out = '', shown = 0, all = sortedCases();
     for (var i = 0; i < list.length; i++) {
-      var a = list[i];
+      var r = list[i], a = r.a;
       var hay = [a.id, a.species, a.breed, a.location, a.sex, a.ownerName].join(' ').toLowerCase();
       if (q && hay.indexOf(q) === -1) { continue; }
       shown++;
-      var cases = sortedCases().filter(function (c) { return c.animalId === a.id; });
-      var isOpen = !!openRec[a.id];
-      var line = a.unregistered ? esc(a.species) + ' \u00B7 not registered' : esc(a.species) + ' \u00B7 ' + esc(a.breed) + '<br>' + esc(a.sex) + ' \u00B7 ' + esc(ageText(a)) + ' \u00B7 ' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded');
-      out += '<div class="card"><button type="button" class="rec-head" data-toggle="' + esc(a.id) + '" aria-expanded="' + isOpen + '">' +
-        '<div class="cc-top"><span>' + etag(a.id) + sampleTag(a) + '</span><span class="badge b-ok" style="background:#EEF2EC;color:#2E3F35">' + cases.length + ' case' + (cases.length === 1 ? '' : 's') + (isOpen ? ' \u25B2' : ' \u25BC') + '</span></div>' +
+      var rcases = all.filter(function (c) { return c.reporterId + '|' + c.animalId === r.key; });
+      var isOpen = !!openRec[r.key];
+      var line = a.breed ? esc(a.species) + ' · ' + esc(a.breed) + '<br>' + esc(a.sex) + ' · ' + esc(ageText(a)) + ' · ' + esc(a.location) + '<br>Owner: ' + esc(a.ownerName || 'Not recorded')
+        : esc(a.species) + ' · not registered';
+      out += '<div class="card"><button type="button" class="rec-head" data-toggle="' + esc(r.key) + '" aria-expanded="' + isOpen + '">' +
+        '<div class="cc-top"><span>' + etag(a.id) + '</span><span class="badge" style="background:#EEF2EC;color:#2E3F35">' + rcases.length + ' case' + (rcases.length === 1 ? '' : 's') + (isOpen ? ' ▲' : ' ▼') + '</span></div>' +
         '<div class="cc-meta">' + line + '</div></button>';
       if (isOpen) {
         out += '<div class="rec-body"><h3 style="font-size:17px;margin-bottom:6px">Clinical case history</h3>';
-        if (!cases.length) { out += '<div class="hint">No cases reported for this animal.</div>'; }
-        for (var j = 0; j < cases.length; j++) {
-          var c2 = cases[j];
-          out += '<a class="rec-link" href="#cases/' + encodeURIComponent(c2.ref) + '"><b>' + esc(c2.ref) + '</b>' + sampleTag(c2) + ' ' + badge(c2.status) +
-            '<div class="cc-meta">' + esc(fmtDate(c2.created)) + ' \u00B7 ill ' + esc(durText(c2)) + ' \u00B7 appetite ' + esc(c2.appetite.toLowerCase()) + ' \u00B7 ' + esc(tempText(c2)) +
-            '<br>Affected ' + c2.affected + ' \u00B7 Deaths ' + c2.deaths + '</div></a>';
+        if (!rcases.length) { out += '<div class="hint">No cases reported for this animal.</div>'; }
+        for (var j = 0; j < rcases.length; j++) {
+          var c2 = rcases[j];
+          out += '<a class="rec-link" href="#cases/' + encodeURIComponent(c2.rowId) + '"><b>' + esc(c2.ref) + '</b> ' + badge(c2.status) +
+            '<div class="cc-meta">' + esc(fmtDate(c2.created)) + ' · ill ' + esc(durText(c2)) + ' · appetite ' + esc(String(c2.appetite).toLowerCase()) + ' · ' + esc(tempText(c2)) +
+            '<br>Affected ' + c2.affected + ' · Deaths ' + c2.deaths + '</div></a>';
         }
-        out += '<div style="margin-top:12px"><button type="button" class="btn sm" data-report-for="' + esc(a.id) + '" style="margin:0">Report a case for this animal</button></div></div>';
+        if (r.own) { out += '<div style="margin-top:12px"><button type="button" class="btn sm" data-report-for="' + esc(a.id) + '" style="margin:0">Report a case for this animal</button></div>'; }
+        out += '</div>';
       }
       out += '</div>';
     }
-    $('rec-list').innerHTML = out || emptyBox(state.animals.length ? 'No animals match your search.' : 'No animals registered yet.', state.animals.length ? '' : '#register', 'Register an animal');
+    $('rec-list').innerHTML = out || emptyBox(list.length ? 'No animals match your search.' : 'No animals registered yet.', list.length ? '' : '#register', 'Register an animal');
   }
 
   /* ---------- Routing ---------- */
   var VIEWS = ['dashboard', 'register', 'report', 'cases', 'records'];
-  function route() {
+  function currentView() {
     var parts = (location.hash || '#dashboard').slice(1).split('/');
-    var v = VIEWS.indexOf(parts[0]) >= 0 ? parts[0] : 'dashboard';
-    var arg = parts[1] ? decodeURIComponent(parts[1]) : '';
-    var i, links = $('nav').getElementsByTagName('a');
+    return { name: VIEWS.indexOf(parts[0]) >= 0 ? parts[0] : 'dashboard', arg: parts[1] ? decodeURIComponent(parts[1]) : '' };
+  }
+  function route() {
+    if (!appReady) { return; }
+    var cv = currentView(), v = cv.name, arg = cv.arg, i, links = $('nav').getElementsByTagName('a');
     for (i = 0; i < VIEWS.length; i++) { $('view-' + VIEWS[i]).hidden = VIEWS[i] !== v; }
     for (i = 0; i < links.length; i++) { links[i].className = links[i].getAttribute('data-v') === v ? 'on' : ''; }
-
     if (v === 'dashboard') { renderDashboard(); }
-    if (v === 'register') { fillBreeds(); renderRecentAnimals(); }
+    if (v === 'register') { prefillOwner(); fillBreeds(); renderRecentAnimals(); }
     if (v === 'report') {
       fillAnimalList();
       if (pendingReportId) { $('r-animal').value = pendingReportId; pendingReportId = ''; }
@@ -978,97 +1383,115 @@ a.btn.alt{color:var(--green)}
     if (v === 'records') { renderRecords(); }
     window.scrollTo(0, 0);
   }
-  var pendingReportId = '';
   window.addEventListener('hashchange', route);
 
-  /* ---------- Click handling ---------- */
+  /* ---------- Clicks ---------- */
   function findAttr(el, attr) {
-    while (el && el !== document) {
-      if (el.getAttribute && el.getAttribute(attr) !== null) { return el; }
-      el = el.parentNode;
-    }
+    while (el && el !== document) { if (el.getAttribute && el.getAttribute(attr) !== null) { return el; } el = el.parentNode; }
     return null;
   }
+  function currentNotes() {
+    return { dx: $('va-dx') ? $('va-dx').value.trim() : '', tests: $('va-tests') ? $('va-tests').value.trim() : '', plan: $('va-plan') ? $('va-plan').value.trim() : '' };
+  }
   document.addEventListener('click', function (e) {
-    var t;
+    var t, id = e.target && e.target.id, c;
+    if ((t = findAttr(e.target, 'data-auth'))) { setAuthMode(t.getAttribute('data-auth')); setNotice(''); return; }
     if ((t = findAttr(e.target, 'data-filter'))) {
       caseFilter = t.getAttribute('data-filter');
-      if (t.tagName === 'A') { return; } /* dashboard tile: let the link navigate, filter is applied */
+      if (t.tagName === 'A') { return; }
       renderFilters(); renderCaseList(); return;
     }
+    if ((t = findAttr(e.target, 'data-take'))) {
+      c = getCase(t.getAttribute('data-take'));
+      if (!c) { return; }
+      setBusy(t, true, 'Taking case…');
+      patchCase(c, { assigned_vet_id: me.id, status: 'Under Veterinary Review', history: historyAdd(c, 'Under Veterinary Review', 'Case taken by ' + myName()) }).then(function (r) {
+        if (r.signedOut) { return; }
+        if (r.saved) { renderCaseDetail(c.rowId); toast('You took this case'); }
+        else { setBusy(t, false); toast(r.empty ? 'Another veterinary surgeon may have taken this case. Refreshing.' : errText(r)); if (r.empty) { softRefresh().then(function () { route(); }); } }
+      });
+      return;
+    }
     if ((t = findAttr(e.target, 'data-set-status'))) {
-      var c = getCase(t.getAttribute('data-ref')), s = t.getAttribute('data-set-status');
+      c = getCase(t.getAttribute('data-id'));
+      var s = t.getAttribute('data-set-status');
       if (c && c.status !== s) {
-        c.status = s; c.history.push({ status: s, at: nowISO() }); save();
-        renderCaseDetail(c.ref); toast('Status updated: ' + s);
+        setBusy(t, true, 'Saving…');
+        patchCase(c, { status: s, history: historyAdd(c, s, '') }).then(function (r) {
+          if (r.signedOut) { return; }
+          if (r.saved) { renderCaseDetail(c.rowId); toast('Status updated: ' + s); }
+          else { setBusy(t, false); toast(errText(r)); }
+        });
       }
       return;
     }
     if ((t = findAttr(e.target, 'data-save-assess'))) {
-      var ac = getCase(t.getAttribute('data-save-assess'));
-      if (ac) { saveAssess(ac); renderCaseDetail(ac.ref); toast('Saved'); }
+      c = getCase(t.getAttribute('data-save-assess'));
+      if (!c) { return; }
+      var nt = currentNotes(); nt.at = nowISO(); nt.by = myName();
+      setBusy(t, true, 'Saving…');
+      patchCase(c, { vet_notes: nt }).then(function (r) {
+        if (r.signedOut) { return; }
+        if (r.saved) { renderCaseDetail(c.rowId); toast('Assessment saved'); }
+        else { setBusy(t, false); toast(errText(r)); }
+      });
       return;
     }
     if ((t = findAttr(e.target, 'data-send-advice'))) {
-      var sc = getCase(t.getAttribute('data-send-advice'));
-      if (sc) {
-        saveAssess(sc);
-        var oa = getAnimal(sc.animalId), num = oa && oa.ownerPhone ? waNumber(oa.ownerPhone) : '';
-        window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(adviceText(sc)), '_blank');
-        renderCaseDetail(sc.ref);
-      }
-      return;
-    }
-    if ((t = findAttr(e.target, 'data-save-vet'))) {
-      var vc = getCase(t.getAttribute('data-save-vet')), vn = $('v-name').value.trim(), vp = $('v-phone').value.trim();
-      $('e-v-phone').hidden = true;
-      if (vp && !phoneOK(vp)) { $('e-v-phone').textContent = 'Enter a phone number with 10 to 15 digits, or leave it blank.'; $('e-v-phone').hidden = false; return; }
-      if (vc) { vc.vetName = vn; vc.vetPhone = vp; save(); renderCaseDetail(vc.ref); toast('Veterinary surgeon saved'); }
+      c = getCase(t.getAttribute('data-send-advice'));
+      if (!c) { return; }
+      var cn = currentNotes(), a2 = animalOf(c), rp2 = profiles[c.reporterId], ph = a2 && a2.ownerPhone ? a2.ownerPhone : (rp2 && rp2.phone ? rp2.phone : '');
+      t.href = waLink(ph, adviceText(c, cn)); /* uses what is on screen right now */
+      var nn = { dx: cn.dx, tests: cn.tests, plan: cn.plan, at: nowISO(), by: myName() };
+      patchCase(c, { vet_notes: nn }); /* also keep it on the case */
       return;
     }
     if ((t = findAttr(e.target, 'data-delete-case'))) {
-      if (window.confirm('Delete case ' + t.getAttribute('data-delete-case') + '? This cannot be undone.')) {
-        var ref = t.getAttribute('data-delete-case');
-        state.cases = state.cases.filter(function (x) { return x.ref !== ref; });
-        save(); toast('Case deleted'); location.hash = '#cases';
+      c = getCase(t.getAttribute('data-delete-case'));
+      if (c && window.confirm('Delete case ' + c.ref + '? This cannot be undone.')) {
+        rest('DELETE', 'cases?id=eq.' + encodeURIComponent(c.rowId)).then(function (r) {
+          if (r.signedOut) { return; }
+          if (r.ok) { cases = cases.filter(function (x) { return x.rowId !== c.rowId; }); toast('Case deleted'); location.hash = '#cases'; }
+          else { toast(errText(r)); }
+        });
       }
       return;
     }
-    if ((t = findAttr(e.target, 'data-toggle'))) {
-      var id = t.getAttribute('data-toggle');
-      openRec[id] = !openRec[id]; renderRecords(); return;
-    }
-    if ((t = findAttr(e.target, 'data-report-for'))) {
-      pendingReportId = t.getAttribute('data-report-for'); location.hash = '#report'; return;
-    }
-    if (e.target.id === 'btn-rm-sample') {
-      if (window.confirm('Remove all sample animals and cases? Records you added stay.')) {
-        state.animals = state.animals.filter(function (a) { return !a.sample; });
-        state.cases = state.cases.filter(function (c) { return !c.sample; });
-        save(); renderDashboard(); toast('Sample data removed');
-      }
+    if ((t = findAttr(e.target, 'data-toggle'))) { var key = t.getAttribute('data-toggle'); openRec[key] = !openRec[key]; renderRecords(); return; }
+    if ((t = findAttr(e.target, 'data-report-for'))) { pendingReportId = t.getAttribute('data-report-for'); location.hash = '#report'; return; }
+    if (id === 'btn-refresh') {
+      setBusy(e.target, true, 'Refreshing…');
+      loadAll().then(function (r) { setBusy(e.target, false); if (r.ok) { renderDashboard(); toast('Up to date'); } else if (!r.signedOut) { toast(errText(r.res)); } });
       return;
     }
-    if (e.target.id === 'btn-reset') {
-      if (window.confirm('Delete ALL animals and cases stored on this device? This cannot be undone.')) {
-        state = { animals: [], cases: [], nextCase: 1 }; save(); openRec = {}; renderDashboard(); toast('All records deleted');
-      }
+    if (id === 'btn-refresh-case') {
+      var cid = e.target.getAttribute('data-id');
+      setBusy(e.target, true, 'Refreshing…');
+      loadAll().then(function (r) { if (r.ok) { renderCaseDetail(cid); toast('Up to date'); } else { setBusy(e.target, false); if (!r.signedOut) { toast(errText(r.res)); } } });
+      return;
     }
+    if (id === 'btn-signout' || id === 'btn-err-out') { signOut(); return; }
+    if (id === 'btn-retry') { startApp(); return; }
+    if (id === 'btn-import') { importLocal(e.target); return; }
+    if (id === 'btn-import-skip') { lsSet(IMPORT_KEY, me.id); renderDashboard(); return; }
   });
   $('case-search').addEventListener('input', renderCaseList);
   $('rec-search').addEventListener('input', renderRecords);
-  document.addEventListener('change', function (e) {
-    if (e.target && e.target.name === 'role') { state.role = e.target.value; save(); toast('Using the app as: ' + e.target.value); }
-  });
 
   /* ---------- Start ---------- */
   buildChecks('g-resp', 'r-resp', RESP);
   buildChecks('g-dig', 'r-dig', DIG);
   buildChecks('g-les', 'r-les', LES);
   buildChecks('g-oth', 'r-oth', OTH);
-  fillAnimalList();
-  $('foot').innerHTML = 'AgriSentinel AI is an early prototype. Built by ' + esc(BUILDER) + '.<br>Feedback: <a href="tel:' + FEEDBACK_PHONE + '">' + FEEDBACK_PHONE + '</a> \u00B7 <a href="https://wa.me/' + waNumber(FEEDBACK_PHONE) + '" target="_blank" rel="noopener">WhatsApp</a> \u00B7 <a href="mailto:' + FEEDBACK_EMAIL + '">' + FEEDBACK_EMAIL + '</a>';
-  route();
+  $('foot').innerHTML = 'AgriSentinel AI is an early prototype. Built by ' + esc(BUILDER) + '.<br>Feedback: <a href="tel:' + FEEDBACK_PHONE + '">' + FEEDBACK_PHONE + '</a> · <a href="https://wa.me/' + waNumber(FEEDBACK_PHONE) + '" target="_blank" rel="noopener">WhatsApp</a> · <a href="mailto:' + FEEDBACK_EMAIL + '">' + FEEDBACK_EMAIL + '</a>';
+  if (navigator.onLine === false) { $('net-warn').hidden = false; }
+
+  loadSession();
+  consumeAuthHash().then(function () {
+    if (!session) {
+      showAuth(pendingNotice ? pendingNotice.html : '', pendingNotice ? pendingNotice.kind : '', 'in');
+    } else { startApp(); }
+  });
 
   if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
     window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });

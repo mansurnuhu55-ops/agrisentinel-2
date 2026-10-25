@@ -209,6 +209,7 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
       <div class="hint">Used to approve your veterinary account. Until it is approved you use the app as a farmer.</div>
       <div class="err" id="e-su-vcn" hidden></div></div>
     <div class="hint" style="margin-bottom:14px">Your name and phone number are shown to the veterinary surgeon who takes your case. Cases that no veterinary surgeon has taken yet are visible to approved veterinary surgeons.</div>
+    <div class="hint" style="margin-bottom:14px">By creating an account you agree to the <a href="privacy.html" target="_blank" rel="noopener">Privacy Policy</a>.</div>
     <div class="err" id="e-form-signup" hidden style="margin:0 0 10px"></div>
     <button type="submit" class="btn">Create account</button>
   </form>
@@ -765,10 +766,10 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
     $('si-pass').type = 'password'; $('su-pass').type = 'password';
     $('cases-list-wrap').hidden = false; $('case-detail').hidden = true;
   }
-  function forceSignOut(msg) {
+  function forceSignOut(msg, kind) {
     saveSession(null); me = null; profile = null; profiles = {}; animals = []; cases = [];
     resetUi();
-    showAuth(msg ? esc(msg) : '', 'warn', 'in');
+    showAuth(msg ? esc(msg) : '', kind || 'warn', 'in');
   }
   function startApp() {
     me = { id: (session.user && session.user.id) || jwtSub(session.access_token), email: (session.user && session.user.email) || '' };
@@ -946,6 +947,24 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
   }
   var pendingNotice = null;
 
+  function deleteAccount(btn) {
+    var typed = ($('del-confirm').value || '').trim();
+    $('e-del').hidden = true;
+    if (typed !== 'DELETE') { $('e-del').textContent = 'Type DELETE in capital letters to confirm.'; $('e-del').hidden = false; return; }
+    setBusy(btn, true, 'Deleting…');
+    rest('POST', 'rpc/delete_my_account', {}).then(function (r) {
+      if (r.signedOut) { return; }
+      setBusy(btn, false);
+      if (!r.ok) {
+        var m = errText(r);
+        if (r.status === 404 || (r.data && r.data.code === 'PGRST202')) { m = 'Account deletion is not switched on yet. Contact ' + BUILDER + ' on ' + FEEDBACK_PHONE + ' to delete your account.'; }
+        $('e-del').textContent = m; $('e-del').hidden = false; return;
+      }
+      forceSignOut('Your account and its records have been deleted.', 'info');
+      location.hash = '#dashboard';
+    });
+  }
+
   function signOut() {
     var tok = session && session.access_token;
     if (tok) { http('POST', '/auth/v1/logout', null, { token: tok }); }
@@ -1079,6 +1098,12 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
       acct += '<div class="banner warn">Your veterinary account is waiting for approval. Until then you use the app as a farmer. Contact ' + esc(BUILDER) + ' on ' + esc(FEEDBACK_PHONE) + ' to be approved.</div>';
     }
     acct += '<div class="two"><button type="button" class="btn alt sm" id="btn-refresh" style="margin:0">Refresh</button><button type="button" class="btn alt sm" id="btn-signout" style="margin:0">Sign out</button></div>';
+    acct += '<div style="margin-top:12px"><button type="button" class="btn danger sm" id="btn-delete-account" style="margin:0">Delete my account</button></div>' +
+      '<div id="del-panel" hidden style="margin-top:12px"><div class="banner bad" style="margin-bottom:10px">This permanently deletes your account' + (profile.role === 'vet' ? '' : ', all your animals and all your cases') + '. It cannot be undone.' +
+      (profile.role === 'vet' ? ' Advice you wrote on a farmer\'s case stays on that farmer\'s record.' : '') + '</div>' +
+      '<label class="lbl" for="del-confirm">Type DELETE to confirm</label><input type="text" id="del-confirm" autocapitalize="characters" autocomplete="off">' +
+      '<div class="err" id="e-del" hidden></div>' +
+      '<div class="two" style="margin-top:10px"><button type="button" class="btn danger sm" id="btn-delete-confirm" style="margin:0">Delete everything</button><button type="button" class="btn alt sm" id="btn-delete-cancel" style="margin:0">Keep my account</button></div></div>';
     $('acct-card').innerHTML = acct;
     refreshAdmin();
 
@@ -1524,6 +1549,9 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
       loadAll().then(function (r) { if (r.ok) { renderCaseDetail(cid); toast('Up to date'); } else { setBusy(e.target, false); if (!r.signedOut) { toast(errText(r.res)); } } });
       return;
     }
+    if (id === 'btn-delete-account') { $('del-panel').hidden = false; e.target.hidden = true; $('del-confirm').focus(); return; }
+    if (id === 'btn-delete-cancel') { $('del-panel').hidden = true; $('btn-delete-account').hidden = false; $('del-confirm').value = ''; $('e-del').hidden = true; return; }
+    if (id === 'btn-delete-confirm') { deleteAccount(e.target); return; }
     if (id === 'btn-signout' || id === 'btn-err-out') { signOut(); return; }
     if (id === 'btn-retry') { startApp(); return; }
     if (id === 'btn-import') { importLocal(e.target); return; }
@@ -1537,7 +1565,7 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
   buildChecks('g-dig', 'r-dig', DIG);
   buildChecks('g-les', 'r-les', LES);
   buildChecks('g-oth', 'r-oth', OTH);
-  $('foot').innerHTML = 'AgriSentinel AI is an early prototype. Built by ' + esc(BUILDER) + '.<br>Feedback: <a href="tel:' + FEEDBACK_PHONE + '">' + FEEDBACK_PHONE + '</a> · <a href="https://wa.me/' + waNumber(FEEDBACK_PHONE) + '" target="_blank" rel="noopener">WhatsApp</a> · <a href="mailto:' + FEEDBACK_EMAIL + '">' + FEEDBACK_EMAIL + '</a>';
+  $('foot').innerHTML = 'AgriSentinel AI is an early prototype. Built by ' + esc(BUILDER) + '.<br>Feedback: <a href="tel:' + FEEDBACK_PHONE + '">' + FEEDBACK_PHONE + '</a> · <a href="https://wa.me/' + waNumber(FEEDBACK_PHONE) + '" target="_blank" rel="noopener">WhatsApp</a> · <a href="mailto:' + FEEDBACK_EMAIL + '">' + FEEDBACK_EMAIL + '</a><br><a href="privacy.html">Privacy policy</a> · <a href="delete-account.html">How to delete your account</a>';
   if (navigator.onLine === false) { $('net-warn').hidden = false; }
 
   loadSession();

@@ -229,6 +229,7 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
   <h1 class="page">Dashboard</h1>
   <p class="lead">Cattle, goats and sheep at a glance.</p>
   <div class="card" id="acct-card"></div>
+  <div class="card" id="admin-card" hidden></div>
   <div class="notice">
     <b>Not a diagnostic tool</b>
     AgriSentinel AI helps you record and track animal health problems. It does not diagnose diseases, prescribe medicines or give treatment doses. If animals are very sick or dying, contact a veterinary surgeon straight away.
@@ -754,7 +755,8 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
   function resetUi() {
     /* Nothing from the previous person may stay on screen or in the forms. */
     caseFilter = 'All'; openRec = {}; pendingReportId = '';
-    var ids = ['acct-card', 'tiles', 'review-line', 'vet-wait', 'import-card', 'dash-recent', 'recent-animals', 'case-list', 'case-detail', 'rec-list', 'case-count', 'case-filters'], i;
+    vetList = null; vetErr = '';
+    var ids = ['acct-card', 'admin-card', 'tiles', 'review-line', 'vet-wait', 'import-card', 'dash-recent', 'recent-animals', 'case-list', 'case-detail', 'rec-list', 'case-count', 'case-filters'], i;
     for (i = 0; i < ids.length; i++) { $(ids[i]).innerHTML = ''; }
     $('review-line').textContent = '';
     $('case-search').value = ''; $('rec-search').value = '';
@@ -1023,6 +1025,46 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
     var cs = (s.cases || []).filter(function (c) { return !c.sample; });
     return an.length || cs.length ? { animals: an, cases: cs } : null;
   }
+  /* ---------- Administrator: approve veterinary surgeons ---------- */
+  var vetList = null, vetErr = '';
+  function loadVets() {
+    return rest('POST', 'rpc/list_vets', {}).then(function (r) {
+      if (r.signedOut) { return; }
+      if (r.ok && r.data instanceof Array) { vetList = r.data; vetErr = ''; }
+      else if (r.status === 404 || (r.data && r.data.code === 'PGRST202')) { vetErr = 'The approval setup has not been added to the database yet. Run the approval code in Supabase once.'; }
+      else { vetErr = errText(r); }
+    });
+  }
+  function renderAdmin() {
+    var box = $('admin-card');
+    if (!profile || !profile.is_admin) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    var h = '<h3>Veterinary surgeon approvals</h3>', i, v, pend = 0;
+    if (vetErr) { h += '<div class="banner warn">' + esc(vetErr) + '</div>'; }
+    else if (vetList === null) { h += '<div class="hint">Loading…</div>'; }
+    else if (!vetList.length) { h += '<div class="hint">No veterinary surgeons have created an account yet.</div>'; }
+    else {
+      for (i = 0; i < vetList.length; i++) { if (!vetList[i].vet_verified) { pend++; } }
+      h += '<div class="hint" style="margin:0 0 4px">' + (pend ? pend + ' waiting for approval. Check the VCN number before you approve.' : 'No one is waiting for approval.') + '</div>';
+      for (i = 0; i < vetList.length; i++) {
+        v = vetList[i];
+        h += '<div class="dx"><div class="cc-top"><b>' + esc(v.full_name || 'No name') + '</b>' +
+          (v.vet_verified ? '<span class="badge b-ok">Approved</span>' : '<span class="badge b-rev">Waiting</span>') + '</div>' +
+          '<div class="cc-meta">VCN: ' + esc(v.vcn || 'not given') + '<br>' + esc(v.email || '') + '<br>' + phoneLinks(v.phone) + '</div>';
+        if (v.vet_verified) {
+          if (me && v.id !== me.id) {
+            h += '<div style="margin-top:10px"><button type="button" class="btn alt sm" data-vet-approval="' + esc(v.id) + '" data-approve="0" style="margin:0">Remove approval</button></div>';
+          }
+        } else {
+          h += '<div style="margin-top:10px"><button type="button" class="btn sm" data-vet-approval="' + esc(v.id) + '" data-approve="1" style="margin:0">Approve this veterinary surgeon</button></div>';
+        }
+        h += '</div>';
+      }
+    }
+    box.innerHTML = h;
+  }
+  function refreshAdmin() { renderAdmin(); if (profile && profile.is_admin) { loadVets().then(renderAdmin); } }
+
   function renderDashboard() {
     var open = 0, res = 0, rev = 0, wait = 0, i, c;
     for (i = 0; i < cases.length; i++) {
@@ -1038,6 +1080,7 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
     }
     acct += '<div class="two"><button type="button" class="btn alt sm" id="btn-refresh" style="margin:0">Refresh</button><button type="button" class="btn alt sm" id="btn-signout" style="margin:0">Sign out</button></div>';
     $('acct-card').innerHTML = acct;
+    refreshAdmin();
 
     $('vet-wait').innerHTML = isVerifiedVet() && wait > 0
       ? '<a class="btn" href="#cases" data-filter="Unassigned">' + wait + ' case' + (wait === 1 ? '' : 's') + ' waiting for a veterinary surgeon</a>' : '';
@@ -1400,6 +1443,17 @@ details.more summary{min-height:48px;display:flex;align-items:center;font-weight
       caseFilter = t.getAttribute('data-filter');
       if (t.tagName === 'A') { return; }
       renderFilters(); renderCaseList(); return;
+    }
+    if ((t = findAttr(e.target, 'data-vet-approval'))) {
+      var vid = t.getAttribute('data-vet-approval'), ap = t.getAttribute('data-approve') === '1';
+      if (!ap && !window.confirm('Remove approval? This veterinary surgeon will lose access to farmers\' cases.')) { return; }
+      setBusy(t, true, 'Saving…');
+      rest('POST', 'rpc/set_vet_approval', { vet_id: vid, approved: ap }).then(function (r) {
+        if (r.signedOut) { return; }
+        if (!r.ok) { setBusy(t, false); toast(errText(r)); return; }
+        loadVets().then(function () { renderAdmin(); toast(ap ? 'Veterinary surgeon approved' : 'Approval removed'); });
+      });
+      return;
     }
     if ((t = findAttr(e.target, 'data-take'))) {
       c = getCase(t.getAttribute('data-take'));
